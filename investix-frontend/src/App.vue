@@ -1,13 +1,14 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
+<script setup lang="ts">
+// import { Header } from '../src/components/Header.vue';
 </script>
 
 <template>
-    <header>
-    </header>
-        teste
-    <RouterView />
-</template>
+  <!-- <NavBar v-once></NavBar> -->
+  <!-- <header>
+    <Header />
+  </header> -->
 
-<style scoped>
-</style>
+  <main>
+    <RouterView />
+  </main>
+</template>
