@@ -1,0 +1,51 @@
+services:
+  frontend:
+    build:
+      context: ./invistaix-frontend
+    container_name: invistaix-frontend
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./invistaix-frontend:/app
+      - /app/node_modules  # evita conflito entre host e container
+    command: ["npm", "run", "dev", "--", "--host"]
+    depends_on:
+      - backend
+    networks:
+      - invistaix-network
+
+  backend:
+    build:
+      context: ./invistaix-backend
+    container_name: invistaix-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/invistaix-db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin123
+    depends_on:
+      - postgres
+    networks:
+      - invistaix-network
+
+  postgres:
+    image: postgres:15
+    container_name: invistaix-postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=invistaix-db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - invistaix-network
+
+volumes:
+  pgdata:
+
+networks:
+  invistaix-network:
