@@ -28,7 +28,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-        
+
         <!-- Spring Boot Starter Web para APIs REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -41,11 +41,11 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Driver PostgreSQL -->
+        <!-- Driver MySQL -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.4</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
         </dependency>
 
         <!-- Spring Boot Starter Test para testes unitários e de integração -->
@@ -55,21 +55,20 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- H2 Database para testes (opcional, para rodar testes sem PostgreSQL) -->
+        <!-- H2 Database para testes (opcional, para rodar testes sem MySQL) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>2.3.230</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- Spring Boot Dev Tools fornece reinicializações rápidas de aplicativos, LiveReload e configurações para uma experiência de desenvolvimento aprimorada. -->
+        <!-- Spring Boot Dev Tools para uma experiência de desenvolvimento aprimorada -->
         <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
