@@ -21,40 +21,39 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/invistaix-db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/invistaix-db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin123
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQL8Dialect
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
     depends_on:
-      - mysql
+      - postgres
     networks:
       - invistaix-network
 
-  mysql:
-    image: mysql:8.0
-    container_name: invistaix-mysql
+  postgres:
+    image: postgres:15
+    container_name: invistaix-postgres
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=root123
-      - MYSQL_DATABASE=invistaix-db
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin123
+      - POSTGRES_DB=invistaix-db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "invistaix-db"]
       timeout: 20s
       retries: 10
       interval: 10s
       start_period: 40s
     volumes:
-      - mysql_data:/var/lib/mysql
+      - pgdata:/var/lib/postgresql/data
     ports:
-      - "3307:3306"
+      - "5432:5432"
     networks:
       - invistaix-network
 
 volumes:
-  mysql_data:
+  pgdata:
 
 networks:
   invistaix-network:
