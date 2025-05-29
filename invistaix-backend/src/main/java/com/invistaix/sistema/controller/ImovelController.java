@@ -2,6 +2,7 @@ package com.invistaix.sistema.controller;
 
 import com.invistaix.sistema.model.Imovel;
 import com.invistaix.sistema.service.ImovelService;
+// import com.invistaix.sistema.repository.ImovelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
