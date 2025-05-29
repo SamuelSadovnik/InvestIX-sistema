@@ -52,7 +52,7 @@ public class EnderecoService {
     // Deletar um endereço por ID
     public void delete(Integer id) {
         // Verifica se o endereço existe antes de deletar
-        Endereco endereco = findById(id);
+        enderecoRepository.findById(id);
         enderecoRepository.deleteById(id);
     }
 }

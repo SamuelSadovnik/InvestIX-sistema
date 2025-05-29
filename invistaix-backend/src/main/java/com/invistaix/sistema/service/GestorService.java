@@ -58,7 +58,7 @@ public class GestorService {
     // Deletar um gestor por ID
     public void delete(Integer id) {
         // Verifica se o gestor existe antes de deletar
-        Gestor gestor = findById(id);
+        gestorRepository.findById(id);
         gestorRepository.deleteById(id);
     }
 }

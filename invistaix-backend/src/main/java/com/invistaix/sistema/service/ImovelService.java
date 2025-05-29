@@ -14,16 +14,11 @@ public class ImovelService {
     @Autowired
     private ImovelRepository imovelRepository;
 
-    // Criar ou atualizar um imóvel
-    public Imovel save(Imovel imovel) {
-        return imovelRepository.save(imovel);
-    }
-
     // Listar todos os imóveis
     public List<Imovel> findAll() {
         return imovelRepository.findAll();
     }
-
+    
     // Buscar um imóvel por ID
     public Imovel findById(Integer id) {
         Optional<Imovel> imovel = imovelRepository.findById(id);
@@ -32,11 +27,15 @@ public class ImovelService {
         }
         return imovel.get();
     }
+    
+    // Criar ou atualizar um imóvel, função auxiliar para simplificar o 
+    public Imovel save(Imovel imovel) {
+        return imovelRepository.save(imovel);
+    }
 
     // Atualizar um imóvel existente
     public Imovel update(Integer id, Imovel imovel) {
-        // Verifica se o imóvel existe
-        Imovel existingImovel = findById(id);
+        Imovel existingImovel = findById(id); // Verifica se o imóvel existe
         // Atualiza os campos do imóvel existente com os novos valores
         existingImovel.setNomeImovel(imovel.getNomeImovel());
         existingImovel.setTipoImovel(imovel.getTipoImovel());
@@ -51,13 +50,13 @@ public class ImovelService {
         existingImovel.setArea(imovel.getArea());
         existingImovel.setNumQuartos(imovel.getNumQuartos());
         existingImovel.setNumeroApartamentos(imovel.getNumeroApartamentos());
+        
         return imovelRepository.save(existingImovel);
     }
 
     // Deletar um imóvel por ID
     public void delete(Integer id) {
-        // Verifica se o imóvel existe antes de deletar
-        Imovel imovel = findById(id);
+        imovelRepository.findById(id); // Verifica se o imóvel existe antes de deletar
         imovelRepository.deleteById(id);
     }
 }
