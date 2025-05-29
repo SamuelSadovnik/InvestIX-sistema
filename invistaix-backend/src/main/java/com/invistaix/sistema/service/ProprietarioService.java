@@ -62,8 +62,7 @@ public class ProprietarioService {
 
     // Deletar um proprietário por ID
     public void delete(Integer id) {
-        // Verifica se o proprietário existe antes de deletar
-        Proprietario proprietario = findById(id);
+        proprietarioRepository.findById(id); // Verifica se o proprietário existe antes de deletar
         proprietarioRepository.deleteById(id);
     }
 }
