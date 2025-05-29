@@ -18,7 +18,7 @@ public class ImovelService {
     public List<Imovel> findAll() {
         return imovelRepository.findAll();
     }
-    
+
     // Buscar um imóvel por ID
     public Imovel findById(Integer id) {
         Optional<Imovel> imovel = imovelRepository.findById(id);
@@ -28,7 +28,7 @@ public class ImovelService {
         return imovel.get();
     }
     
-    // Criar ou atualizar um imóvel, função auxiliar para simplificar o 
+    // Criar ou atualizar um imóvel, função auxiliar para simplificar
     public Imovel save(Imovel imovel) {
         return imovelRepository.save(imovel);
     }
