@@ -75,8 +75,8 @@ public class Imovel {
     @ManyToMany
     @JoinTable(
         name = "IMOVEL_IMPOSTO",
-        joinColumns = @JoinColumn(name = "imposto_id"),
-        inverseJoinColumns = @JoinColumn(name = "imovel_id")
+        joinColumns = @JoinColumn(name = "imovel_id"),
+        inverseJoinColumns = @JoinColumn(name = "imposto_id")
     )
     private Set<Imposto> impostos;
 
