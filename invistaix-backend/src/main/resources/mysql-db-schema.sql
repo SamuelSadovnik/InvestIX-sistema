@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS IMOVEIS (
     imovel_id INT PRIMARY KEY,
     nome_imovel VARCHAR(100) NOT NULL, -- Nome ou identificação do imóvel
     tipo_imovel VARCHAR(50) NOT NULL,
-    endereco_id INT,
+    endereco_id INT NOT NULL,
     proprietario_id INT,
-    gestor_id INT, -- Nova coluna adicionada
+    gestor_id INT,
     -- Matricula
     valor_matricula DECIMAL(10, 2) NOT NULL, -- Valor da matrícula
     data_registro_matricula DATE NOT NULL, -- Data de registro da matrícula
@@ -68,9 +68,7 @@ CREATE TABLE IF NOT EXISTS AVALIACOES (
     imovel_id INT,
     valor_avaliacao DECIMAL(10, 2) NOT NULL,
     data_avaliacao DATE NOT NULL,
-    gestor_id INT,
-    FOREIGN KEY (imovel_id) REFERENCES IMOVEIS(imovel_id),
-    FOREIGN KEY (gestor_id) REFERENCES GESTORES(gestor_id)
+    FOREIGN KEY (imovel_id) REFERENCES IMOVEIS(imovel_id)
 );
 
 -- Criação da tabela RENDIMENTOS
