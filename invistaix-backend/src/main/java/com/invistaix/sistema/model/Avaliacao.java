@@ -13,8 +13,9 @@ public class Avaliacao {
     @Column(name = "avaliacao_id")
     private Integer id;
 
-    @Column(name = "imovel_id")
-    private Integer imovelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "imovel_id")
+    private Imovel imovel;
 
     @Column(name = "valor_avaliacao", nullable = false)
     private BigDecimal valorAvaliacao;
@@ -22,19 +23,15 @@ public class Avaliacao {
     @Column(name = "data_avaliacao", nullable = false)
     private LocalDate dataAvaliacao;
 
-    @Column(name = "gestor_id")
-    private Integer gestorId;
-
     // Construtores
     public Avaliacao() {
     }
 
-    public Avaliacao(Integer id, Integer imovelId, BigDecimal valorAvaliacao, LocalDate dataAvaliacao, Integer gestorId) {
+    public Avaliacao(Integer id, Imovel imovel, BigDecimal valorAvaliacao, LocalDate dataAvaliacao) {
         this.id = id;
-        this.imovelId = imovelId;
+        this.imovel = imovel;
         this.valorAvaliacao = valorAvaliacao;
         this.dataAvaliacao = dataAvaliacao;
-        this.gestorId = gestorId;
     }
 
     // Getters e Setters
@@ -46,12 +43,12 @@ public class Avaliacao {
         this.id = id;
     }
 
-    public Integer getImovelId() {
-        return imovelId;
+    public Imovel getImovel() {
+        return imovel;
     }
 
-    public void setImovelId(Integer imovelId) {
-        this.imovelId = imovelId;
+    public void setImovel(Imovel imovel) {
+        this.imovel = imovel;
     }
 
     public BigDecimal getValorAvaliacao() {
@@ -68,13 +65,5 @@ public class Avaliacao {
 
     public void setDataAvaliacao(LocalDate dataAvaliacao) {
         this.dataAvaliacao = dataAvaliacao;
-    }
-
-    public Integer getGestorId() {
-        return gestorId;
-    }
-
-    public void setGestorId(Integer gestorId) {
-        this.gestorId = gestorId;
     }
 }

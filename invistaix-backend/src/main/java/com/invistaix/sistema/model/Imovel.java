@@ -3,6 +3,7 @@ package com.invistaix.sistema.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "IMOVEIS")
@@ -24,7 +25,7 @@ public class Imovel {
     private Endereco endereco;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proprietario_id", nullable = false)
+    @JoinColumn(name = "proprietario_id")
     private Proprietario proprietario;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,6 +55,30 @@ public class Imovel {
 
     @Column(name = "numero_apartamentos")
     private Integer numeroApartamentos;
+
+    @ManyToMany
+    @JoinTable(
+        name = "IMOVEL_DESPESA",
+        joinColumns = @JoinColumn(name = "imovel_id"),
+        inverseJoinColumns = @JoinColumn(name = "despesa_id")
+    )
+    private Set<Despesa> despesas;
+
+    @ManyToMany
+    @JoinTable(
+        name = "IMOVEL_RENDIMENTO",
+        joinColumns = @JoinColumn(name = "imovel_id"),
+        inverseJoinColumns = @JoinColumn(name = "rendimento_id")
+    )
+    private Set<Rendimento> rendimentos;
+
+    @ManyToMany
+    @JoinTable(
+        name = "IMOVEL_IMPOSTO",
+        joinColumns = @JoinColumn(name = "imposto_id"),
+        inverseJoinColumns = @JoinColumn(name = "imovel_id")
+    )
+    private Set<Imposto> impostos;
 
     // Construtores
     public Imovel() {

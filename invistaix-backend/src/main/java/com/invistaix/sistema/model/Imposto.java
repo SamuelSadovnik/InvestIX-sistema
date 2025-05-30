@@ -3,6 +3,7 @@ package com.invistaix.sistema.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "IMPOSTOS")
@@ -21,6 +22,9 @@ public class Imposto {
 
     @Column(name = "descricao", length = 255)
     private String descricao;
+
+    @ManyToMany(mappedBy = "impostos")
+    private Set<Imovel> imoveis;
 
     // Construtores
     public Imposto() {
@@ -64,5 +68,13 @@ public class Imposto {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public Set<Imovel> getImoveis() {
+        return imoveis;
+    }
+
+    public void setImoveis(Set<Imovel> imoveis) {
+        this.imoveis = imoveis;
     }
 }
