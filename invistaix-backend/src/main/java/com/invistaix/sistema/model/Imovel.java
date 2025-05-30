@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public class Imovel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "imovel_id")
     private Integer id;
 

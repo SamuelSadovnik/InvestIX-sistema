@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 public class Gestor {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gestor_id")
     private Integer id;
 

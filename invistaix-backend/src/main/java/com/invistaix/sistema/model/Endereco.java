@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class Endereco {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "endereco_id")
     private Integer id;
 
