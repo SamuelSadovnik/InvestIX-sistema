@@ -54,9 +54,8 @@ public class ImovelService {
         return imovelRepository.save(existingImovel);
     }
 
-    // Deletar um imóvel por ID
     public void delete(Integer id) {
-        imovelRepository.findById(id); // Verifica se o imóvel existe antes de deletar
+        imovelRepository.findById(id);
         imovelRepository.deleteById(id);
     }
 }
