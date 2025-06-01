@@ -23,6 +23,37 @@ const marketData = [
 ];
 
 export default function Performance() {
+  const imoveisList = [
+    {
+      name: 'Apartamento Centro - SP',
+      liquidez: 95,
+      tendencia: 'up' as const,
+      roi: '15.2%',
+      tempo: '30 dias'
+    },
+    {
+      name: 'Casa Jardins - SP',
+      liquidez: 88,
+      tendencia: 'up' as const,
+      roi: '12.8%',
+      tempo: '45 dias'
+    },
+    {
+      name: 'Cobertura Barra - RJ',
+      liquidez: 82,
+      tendencia: 'down' as const,
+      roi: '10.5%',
+      tempo: '60 dias'
+    },
+    {
+      name: 'Loft Vila Madalena - SP',
+      liquidez: 90,
+      tendencia: 'up' as const,
+      roi: '13.7%',
+      tempo: '35 dias'
+    }
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -125,12 +156,7 @@ export default function Performance() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[
-              { name: 'Apartamento Centro - SP', liquidez: 95, tendencia: 'up', roi: '15.2%', tempo: '30 dias' },
-              { name: 'Casa Jardins - SP', liquidez: 88, tendencia: 'up', roi: '12.8%', tempo: '45 dias' },
-              { name: 'Cobertura Barra - RJ', liquidez: 82, tendencia: 'down', roi: '10.5%', tempo: '60 dias' },
-              { name: 'Loft Vila Madalena - SP', liquidez: 90, tendencia: 'up', roi: '13.7%', tempo: '35 dias' }
-            ].map((imovel, index) => (
+            {imoveisList.map((imovel, index) => (
               <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                 <div className="flex-1">
                   <h4 className="font-semibold">{imovel.name}</h4>
@@ -155,36 +181,6 @@ export default function Performance() {
                 </div>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Insights e Recomendações */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Insights & Recomendações</CardTitle>
-          <CardDescription>Análises automatizadas para otimizar sua carteira</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                <h4 className="font-semibold text-green-800">Oportunidade</h4>
-              </div>
-              <p className="text-sm text-green-700">
-                Imóveis no Centro de SP estão com alta demanda. Considere aumentar o preço em 5-8%.
-              </p>
-            </div>
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Target className="h-5 w-5 text-blue-600" />
-                <h4 className="font-semibold text-blue-800">Estratégia</h4>
-              </div>
-              <p className="text-sm text-blue-700">
-                Cobertura na Barra precisa de renovação para melhorar liquidez. ROI estimado: +20%.
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>
