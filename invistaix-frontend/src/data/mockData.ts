@@ -82,7 +82,8 @@ export const properties: Property[] = [
     assessments: [
       { date: '2023-01-20', value: 380000, assessor: 'Carlos Mendes' },
       { date: '2024-01-25', value: 420000, assessor: 'Ana Silva' }
-    ]
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: '2',
@@ -99,57 +100,57 @@ export const properties: Property[] = [
     area: 220,
     owner: '2',
     performance: {
-      percentage: 4.8,
+      percentage: 2.1,
       isPositive: true
     },
     assessments: [
-      { date: '2022-06-15', value: 900000, assessor: 'Carlos Mendes' },
-      { date: '2023-06-20', value: 950000, assessor: 'Ana Silva' },
-      { date: '2024-03-10', value: 980000, assessor: 'Carlos Mendes' }
-    ]
+      { date: '2023-02-10', value: 900000, assessor: 'João Souza' },
+      { date: '2024-02-15', value: 980000, assessor: 'Maria Oliveira' }
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: '3',
-    name: 'Sala Comercial',
-    type: 'Comercial',
-    address: 'Av. Paulista, 1500, São Paulo - SP',
-    matriculaValue: 250000,
-    matriculaDate: '2020-11-05',
-    rentValue: 3800,
-    saleValue: 320000,
-    taxValue: 1850,
-    area: 45,
+    name: 'Terreno Alphaville',
+    type: 'Terreno',
+    address: 'Alameda das Flores, 200, Barueri - SP',
+    matriculaValue: 600000,
+    matriculaDate: '2020-09-05',
+    saleValue: 750000,
+    taxValue: 1500,
+    area: 500,
     owner: '3',
     performance: {
       percentage: 1.5,
       isPositive: false
     },
     assessments: [
-      { date: '2021-11-10', value: 270000, assessor: 'Carlos Mendes' },
-      { date: '2022-11-15', value: 300000, assessor: 'Ana Silva' },
-      { date: '2023-11-20', value: 320000, assessor: 'Carlos Mendes' }
-    ]
+      { date: '2023-03-12', value: 700000, assessor: 'Pedro Lima' }
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: '4',
-    name: 'Terreno Industrial',
-    type: 'Terreno',
-    address: 'Rod. Anhanguera, km 15, São Paulo - SP',
-    matriculaValue: 1200000,
-    matriculaDate: '2019-03-20',
-    saleValue: 1800000,
-    taxValue: 8500,
-    area: 5000,
-    owner: '2',
+    name: 'Apartamento Moema',
+    type: 'Apartamento',
+    address: 'Av. Ibirapuera, 3000, São Paulo - SP',
+    matriculaValue: 420000,
+    matriculaDate: '2023-03-20',
+    rentValue: 3200,
+    saleValue: 500000,
+    taxValue: 2300,
+    rooms: 3,
+    bathrooms: 2,
+    area: 90,
+    owner: '1',
     performance: {
-      percentage: 6.2,
+      percentage: 4.0,
       isPositive: true
     },
     assessments: [
-      { date: '2020-03-25', value: 1350000, assessor: 'Carlos Mendes' },
-      { date: '2022-03-30', value: 1600000, assessor: 'Ana Silva' },
-      { date: '2024-02-15', value: 1800000, assessor: 'Carlos Mendes' }
-    ]
+      { date: '2024-03-22', value: 500000, assessor: 'Ana Silva' }
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=600&q=80'
   }
 ];
 
