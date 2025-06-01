@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthContextType {
@@ -20,12 +19,12 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  useEffect(() => {
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
+  //   useEffect(() => {
+  //     const savedAuth = localStorage.getItem('isAuthenticated');
+  //     if (savedAuth === 'true') {
+  //       setIsAuthenticated(true);
+  //     }
+  //   }, []);
 
   const login = (username: string, password: string): boolean => {
     if (username === 'admin' && password === 'admin') {
