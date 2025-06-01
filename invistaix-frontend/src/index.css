@@ -1,0 +1,96 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Single theme for black, white, and green */
+    --background: 0 0% 100%;          /* White background */
+    --foreground: 0 0% 0%;            /* Pure black text */
+    --card: 0 0% 98%;                 /* Off-white card */
+    --card-foreground: 0 0% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 140 80% 32%;           /* Strong green */
+    --primary-foreground: 0 0% 100%;  /* White text on green */
+    --secondary: 0 0% 100%;           /* White for secondary backgrounds */
+    --secondary-foreground: 140 80% 32%;/* Green text on white */
+    --muted: 0 0% 95%;                /* Muted almost-white */
+    --muted-foreground: 0 0% 40%;     /* Muted black */
+    --accent: 140 88% 40%;            /* Green accent */
+    --accent-foreground: 0 0% 100%;   /* White on green accent */
+    --destructive: 0 84.2% 60.2%;     /* Red for errors */
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;               /* Light grey border */
+    --input: 0 0% 95%;
+    --ring: 140 80% 32%;              /* Green focus ring */
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 0%;                 /* Pure black sidebar */
+    --sidebar-foreground: 0 0% 100%;               /* White text */
+    --sidebar-primary: 140 80% 32%;                /* Green primary */
+    --sidebar-primary-foreground: 0 0% 100%;       /* White on green */
+    --sidebar-accent: 140 80% 10%;                 /* Very dark green/black */
+    --sidebar-accent-foreground: 140 88% 64%;      /* Light green foreground */
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 140 80% 32%;
+  }
+
+  .dark {
+    --background: 0 0% 0%;               /* Black background */
+    --foreground: 0 0% 100%;             /* White text */
+    --card: 0 0% 9%;                     /* Dark card */
+    --card-foreground: 0 0% 99%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 99%;
+    --primary: 140 88% 36%;              /* Vibrant green */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 9%;                /* Black for secondary */
+    --secondary-foreground: 140 88% 64%; /* Light green text */
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 140 88% 40%;               /* Green accent */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 50.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 18%;
+    --input: 0 0% 15%;
+    --ring: 140 80% 32%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.invistaix-gradient {
+  background: linear-gradient(to right, #000, #12d87e);
+}
+
+.cadastrar-button {
+  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+  box-shadow: 0 4px 15px 0 rgba(5, 150, 105, 0.3);
+}
+
+.cadastrar-button:hover {
+  background: linear-gradient(135deg, #15803d 0%, #047857 100%);
+  box-shadow: 0 6px 20px 0 rgba(5, 150, 105, 0.4);
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-105;
+}

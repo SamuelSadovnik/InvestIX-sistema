@@ -1,0 +1,59 @@
+services:
+  frontend:
+    build:
+      context: ./invistaix-frontend
+    container_name: invistaix-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./invistaix-frontend:/app
+      - /app/node_modules  # evita conflito entre host e container
+    command: ["npm", "run", "dev", "--", "--host"]
+    depends_on:
+      - backend
+    networks:
+      - invistaix-network
+
+  backend:
+    build:
+      context: ./invistaix-backend
+    container_name: invistaix-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/invistaix-db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin123
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      - postgres
+    networks:
+      - invistaix-network
+
+  postgres:
+    image: postgres:15
+    container_name: invistaix-postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=invistaix-db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "invistaix-db"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 40s
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - invistaix-network
+
+volumes:
+  pgdata:
+
+networks:
+  invistaix-network:
