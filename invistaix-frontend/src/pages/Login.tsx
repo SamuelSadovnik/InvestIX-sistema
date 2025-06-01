@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -38,14 +37,22 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 p-4 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-green-400 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-emerald-400 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-green-300 rounded-full blur-2xl"></div>
-      </div>
-      
+    <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">
+      {/* Fundo com linhas diagonais mais organizadas */}
+      <svg className="absolute inset-0 w-full h-full z-0" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#6ee7b7" strokeWidth="2" opacity="0.16">
+          <line x1="0" y1="0" x2="100%" y2="100%" />
+          <line x1="0" y1="100%" x2="100%" y2="0" />
+          <line x1="20%" y1="0" x2="100%" y2="80%" />
+          <line x1="0" y1="80%" x2="80%" y2="100%" />
+          <line x1="40%" y1="0" x2="100%" y2="60%" />
+          <line x1="0" y1="60%" x2="60%" y2="100%" />
+          <line x1="60%" y1="0" x2="100%" y2="40%" />
+          <line x1="0" y1="40%" x2="40%" y2="100%" />
+          <line x1="80%" y1="0" x2="100%" y2="20%" />
+          <line x1="0" y1="20%" x2="20%" y2="100%" />
+        </g>
+      </svg>
       <div className="w-full max-w-md relative z-10">
         <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-xl ring-1 ring-white/20">
           <CardHeader className="text-center space-y-6 pb-8">

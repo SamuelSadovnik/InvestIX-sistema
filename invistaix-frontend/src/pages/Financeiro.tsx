@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   DollarSign, 
@@ -44,6 +43,7 @@ import {
   DialogTrigger 
 } from '@/components/ui/dialog';
 import PerformanceChart from '@/components/charts/PerformanceChart';
+import { AddTransactionForm } from '@/components/financeiro/AddTransactionForm';
 
 // Mock data simplificado para evitar dependências externas
 const transactions = [
@@ -109,15 +109,35 @@ const resultData = [
 ];
 
 export default function Financeiro() {
-  const totalIncome = transactions
+  const [transactionsState, setTransactionsState] = useState(transactions);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const totalIncome = transactionsState
     .filter(t => t.type === 'income')
     .reduce((acc, curr) => acc + curr.value, 0);
   
-  const totalExpenses = transactions
+  const totalExpenses = transactionsState
     .filter(t => t.type === 'expense')
     .reduce((acc, curr) => acc + curr.value, 0);
   
   const result = totalIncome - totalExpenses;
+
+  function handleAddTransaction(data: any) {
+    setIsLoading(true);
+    setTimeout(() => {
+      setTransactionsState([
+        ...transactionsState,
+        {
+          ...data,
+          id: (transactionsState.length + 1).toString(),
+          value: Number(data.value),
+        },
+      ]);
+      setIsDialogOpen(false);
+      setIsLoading(false);
+    }, 800);
+  }
 
   return (
     <div className="space-y-6">
@@ -152,7 +172,7 @@ export default function Financeiro() {
             </DialogContent>
           </Dialog>
           
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="invistaix-gradient">
                 <Plus className="h-4 w-4 mr-2" />
@@ -167,9 +187,11 @@ export default function Financeiro() {
                 </DialogDescription>
               </DialogHeader>
               <div className="p-4">
-                <p className="text-center text-muted-foreground">
-                  Formulário de transação seria implementado aqui
-                </p>
+                <AddTransactionForm 
+                  properties={properties}
+                  onSubmit={handleAddTransaction}
+                  isLoading={isLoading}
+                />
               </div>
             </DialogContent>
           </Dialog>
@@ -264,7 +286,7 @@ export default function Financeiro() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.map((transaction) => {
+                  {transactionsState.map((transaction) => {
                     const property = properties.find(p => p.id === transaction.propertyId);
                     return (
                       <TableRow key={transaction.id}>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -58,7 +57,7 @@ const Sidebar = () => {
   };
   
   return (
-    <aside className="bg-sidebar w-full md:w-64 md:min-h-screen flex flex-col">
+    <aside className="bg-sidebar w-64 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 z-30 shadow-lg">
       <div className="p-4">
         <div className="flex items-center justify-center md:justify-start">
           <span className="text-sidebar-foreground text-2xl font-bold">InvistaIX</span>

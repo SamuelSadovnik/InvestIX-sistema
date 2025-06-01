@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { User, Settings, LogOut } from 'lucide-react';
 import { 
@@ -16,8 +15,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const Topbar = () => {
-  const { logout } = useAuth();
+  const { logout, userType } = useAuth();
   const navigate = useNavigate();
+  const username = localStorage.getItem('username') || 'admin';
 
   const handleLogout = () => {
     logout();
@@ -28,6 +28,15 @@ const Topbar = () => {
     navigate('/dashboard/configuracoes');
   };
 
+  // Avatar initials
+  const initials = userType === 'admin' ? 'AD' : userType === 'gestor' ? 'GE' : userType === 'proprietario' ? 'PR' : 'US';
+  // Nome completo
+  const fullName = userType === 'admin' ? 'Administrator' : userType === 'gestor' ? 'Gestor' : userType === 'proprietario' ? 'Proprietario' : 'Usuário';
+  // Email
+  const email = userType === 'admin' ? 'admin@invistaix.com' : userType === 'gestor' ? 'gestor@invistaix.com' : userType === 'proprietario' ? 'proprietario@invistaix.com' : 'usuario@invistaix.com';
+  // Tipo
+  const tipo = userType === 'admin' ? 'Administrador' : userType === 'gestor' ? 'Gestor' : userType === 'proprietario' ? 'Proprietario' : 'Usuário';
+
   return (
     <header className="border-b bg-background px-4 py-3 flex items-center justify-end">
       <div className="flex items-center">
@@ -35,9 +44,9 @@ const Topbar = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-accent">
               <Avatar className="h-9 w-9">
-                <AvatarImage src="" alt="Admin" />
+                <AvatarImage src="" alt={fullName} />
                 <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-600 text-white font-semibold">
-                  AD
+                  {initials}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -47,21 +56,21 @@ const Topbar = () => {
               <div className="flex flex-col space-y-2">
                 <div className="flex items-center space-x-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt="Admin" />
+                    <AvatarImage src="" alt={fullName} />
                     <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-600 text-white text-sm">
-                      AD
+                      {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <p className="text-sm font-medium leading-none">Administrator</p>
+                    <p className="text-sm font-medium leading-none">{fullName}</p>
                     <p className="text-xs leading-none text-muted-foreground mt-1">
-                      admin@invistaix.com
+                      {email}
                     </p>
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  <p>Usuário: ADMIN</p>
-                  <p>Tipo: Administrador</p>
+                  <p>Usuário: {username.toUpperCase()}</p>
+                  <p>Tipo: {tipo}</p>
                   <p>Status: Ativo</p>
                 </div>
               </div>
