@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { 
   properties, 
@@ -36,6 +37,22 @@ import {
 } from '@/data/mockData';
 
 const Dashboard = () => {
+  const { userType } = useAuth();
+  let welcomeTitle = '';
+  let welcomeDesc = '';
+  let boxClass = 'bg-green-50 border border-green-200';
+
+  if (userType === 'admin') {
+    welcomeTitle = 'Bem-vindo, Administrador!';
+    welcomeDesc = 'Você possui controle total do sistema.';
+  } else if (userType === 'gestor') {
+    welcomeTitle = 'Bem-vindo, Gestor!';
+    welcomeDesc = 'Gerencie imóveis, receitas e despesas.';
+  } else if (userType === 'proprietario') {
+    welcomeTitle = 'Bem-vindo, Proprietário!';
+    welcomeDesc = 'Veja seus imóveis e receitas.';
+  }
+
   const totalProperties = properties.length;
   const totalOwners = owners.length;
   const totalManagers = managers.length;
@@ -60,9 +77,9 @@ const Dashboard = () => {
   
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Visão geral da sua carteira de imóveis e desempenho financeiro.</p>
+      <div className={`rounded-lg p-6 mb-6 ${boxClass}`}> 
+        <h2 className="text-2xl font-semibold mb-1">{welcomeTitle}</h2>
+        <p className="text-muted-foreground">{welcomeDesc}</p>
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
