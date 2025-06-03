@@ -16,40 +16,51 @@ import {
 
 const Sidebar = () => {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, userType } = useAuth();
   
-  const menuItems = [
+  const allMenuItems = [
     { 
       title: "Dashboard", 
       path: "/dashboard", 
-      icon: <LayoutDashboard className="h-5 w-5" /> 
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     },
     { 
       title: "Imóveis", 
       path: "/dashboard/imoveis", 
-      icon: <Home className="h-5 w-5" /> 
+      icon: <Home className="h-5 w-5" />,
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     },
     { 
       title: "Proprietários", 
       path: "/dashboard/proprietarios", 
-      icon: <Users className="h-5 w-5" /> 
+      icon: <Users className="h-5 w-5" />,
+      allowedUsers: ['admin', 'gestor']
     },
     { 
       title: "Gestores", 
       path: "/dashboard/gestores", 
-      icon: <UserPlus className="h-5 w-5" /> 
+      icon: <UserPlus className="h-5 w-5" />,
+      allowedUsers: ['admin']
     },
     { 
       title: "Financeiro", 
       path: "/dashboard/financeiro", 
-      icon: <DollarSign className="h-5 w-5" /> 
+      icon: <DollarSign className="h-5 w-5" />,
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     },
     { 
       title: "Performance", 
       path: "/dashboard/performance", 
-      icon: <BarChart3 className="h-5 w-5" /> 
+      icon: <BarChart3 className="h-5 w-5" />,
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     }
   ];
+
+  // Filtrar itens de menu baseado no tipo de usuário
+  const menuItems = allMenuItems.filter(item => 
+    item.allowedUsers.includes(userType || '')
+  );
 
   const handleLogout = () => {
     logout();

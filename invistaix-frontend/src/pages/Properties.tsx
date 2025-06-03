@@ -28,8 +28,10 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Properties = () => {
+  const { userType } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [propertyType, setPropertyType] = useState<string | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,29 +53,30 @@ const Properties = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div className="space-y-6">      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Imóveis</h1>
           <p className="text-muted-foreground">Gerencie sua carteira de imóveis</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="invistaix-gradient">
-              <Plus className="h-4 w-4 mr-2" />
-              Cadastrar Imóvel
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Cadastrar Novo Imóvel</DialogTitle>
-              <DialogDescription>
-                Preencha os detalhes do imóvel para adicioná-lo à sua carteira.
-              </DialogDescription>
-            </DialogHeader>
-            <AddPropertyForm onSuccess={handleFormSuccess} />
-          </DialogContent>
-        </Dialog>
+        {userType !== 'proprietario' && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="invistaix-gradient">
+                <Plus className="h-4 w-4 mr-2" />
+                Cadastrar Imóvel
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Cadastrar Novo Imóvel</DialogTitle>
+                <DialogDescription>
+                  Preencha os detalhes do imóvel para adicioná-lo à sua carteira.
+                </DialogDescription>
+              </DialogHeader>
+              <AddPropertyForm onSuccess={handleFormSuccess} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">

@@ -33,8 +33,7 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/dashboard" element={
+                <Route path="/login" element={<Login />} />                <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <DashboardLayout />
                   </ProtectedRoute>
@@ -42,8 +41,16 @@ const App = () => (
                   <Route index element={<Dashboard />} />
                   <Route path="imoveis" element={<Imoveis />} />
                   <Route path="imoveis/:id" element={<PropertyDetail />} />
-                  <Route path="proprietarios" element={<Proprietarios />} />
-                  <Route path="gestores" element={<Gestores />} />
+                  <Route path="proprietarios" element={
+                    <ProtectedRoute allowedRoles={['admin', 'gestor']}>
+                      <Proprietarios />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="gestores" element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <Gestores />
+                    </ProtectedRoute>
+                  } />
                   <Route path="financeiro" element={<Financeiro />} />
                   <Route path="performance" element={<Performance />} />
                   <Route path="configuracoes" element={<Configuracoes />} />

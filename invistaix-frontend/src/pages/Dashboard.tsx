@@ -80,9 +80,7 @@ const Dashboard = () => {
       <div className={`rounded-lg p-6 mb-6 ${boxClass}`}> 
         <h2 className="text-2xl font-semibold mb-1">{welcomeTitle}</h2>
         <p className="text-muted-foreground">{welcomeDesc}</p>
-      </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      </div>      <div className={`grid gap-4 ${userType === 'proprietario' ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-4'}`}>
         <DashboardCard
           title="Total de Imóveis"
           value={totalProperties}
@@ -90,20 +88,24 @@ const Dashboard = () => {
           icon={<Home />}
           trend={{ value: 20, isPositive: true }}
         />
-        <DashboardCard
-          title="Total de Proprietários"
-          value={totalOwners}
-          description="Proprietários cadastrados"
-          icon={<Users />}
-          trend={{ value: 5, isPositive: true }}
-        />
-        <DashboardCard
-          title="Total de Gestores"
-          value={totalManagers}
-          description="Gestores ativos"
-          icon={<UserPlus />}
-          trend={{ value: 0, isPositive: true }}
-        />
+        {userType !== 'proprietario' && (
+          <DashboardCard
+            title="Total de Proprietários"
+            value={totalOwners}
+            description="Proprietários cadastrados"
+            icon={<Users />}
+            trend={{ value: 5, isPositive: true }}
+          />
+        )}
+        {userType !== 'proprietario' && (
+          <DashboardCard
+            title="Total de Gestores"
+            value={totalManagers}
+            description="Gestores ativos"
+            icon={<UserPlus />}
+            trend={{ value: 0, isPositive: true }}
+          />
+        )}
         <DashboardCard
           title="Resultado Financeiro"
           value={`R$ ${result.toLocaleString()}`}

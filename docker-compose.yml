@@ -1,10 +1,9 @@
-services:
-  frontend:
+services:  frontend:
     build:
       context: ./invistaix-frontend
     container_name: invistaix-frontend
     ports:
-      - "5173:5173"
+      - "8081:8081"
     volumes:
       - ./invistaix-frontend:/app
       - /app/node_modules  # evita conflito entre host e container
