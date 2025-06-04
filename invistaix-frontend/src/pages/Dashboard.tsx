@@ -80,14 +80,22 @@ const Dashboard = () => {
       <div className={`rounded-lg p-6 mb-6 ${boxClass}`}> 
         <h2 className="text-2xl font-semibold mb-1">{welcomeTitle}</h2>
         <p className="text-muted-foreground">{welcomeDesc}</p>
-      </div>      <div className={`grid gap-4 ${userType === 'proprietario' ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-4'}`}>
-        <DashboardCard
-          title="Total de Imóveis"
-          value={totalProperties}
-          description="Imóveis registrados no sistema"
-          icon={<Home />}
-          trend={{ value: 20, isPositive: true }}
-        />
+      </div>      <div className={`grid gap-4 ${
+        userType === 'proprietario' 
+          ? 'md:grid-cols-2' 
+          : userType === 'gestor'
+          ? 'md:grid-cols-4'
+          : 'md:grid-cols-2 lg:grid-cols-4'
+      }`}>
+        <div className={userType === 'gestor' ? 'md:col-span-2' : ''}>
+          <DashboardCard
+            title="Total de Imóveis"
+            value={totalProperties}
+            description="Imóveis registrados no sistema"
+            icon={<Home />}
+            trend={{ value: 20, isPositive: true }}
+          />
+        </div>
         {userType !== 'proprietario' && (
           <DashboardCard
             title="Total de Proprietários"
@@ -97,7 +105,7 @@ const Dashboard = () => {
             trend={{ value: 5, isPositive: true }}
           />
         )}
-        {userType !== 'proprietario' && (
+        {userType === 'admin' && (
           <DashboardCard
             title="Total de Gestores"
             value={totalManagers}

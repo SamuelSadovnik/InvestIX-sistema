@@ -29,9 +29,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   //       setUserType(savedType as any);
   //     }
   //   }, []);
-
   const login = (username: string, password: string): boolean => {
-    if (username === 'admin' && password === 'Admin123') {
+    if (username === 'admin' && password === '123') {
       setIsAuthenticated(true);
       setUserType('admin');
       localStorage.setItem('isAuthenticated', 'true');
@@ -39,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('username', 'admin');
       return true;
     }
-    if (username === 'gestor' && password === 'Gestor123') {
+    if (username === 'gestor' && password === '123') {
       setIsAuthenticated(true);
       setUserType('gestor');
       localStorage.setItem('isAuthenticated', 'true');
@@ -47,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('username', 'gestor');
       return true;
     }
-    if (username === 'proprietario' && password === 'Proprietario123') {
+    if (username === 'proprietario' && password === '123') {
       setIsAuthenticated(true);
       setUserType('proprietario');
       localStorage.setItem('isAuthenticated', 'true');
