@@ -99,17 +99,15 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
       setIsSubmitting(false);
     }
   };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6">
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6 proprietario-form">
+        <Card>          <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Informações Pessoais</CardTitle>
             <CardDescription className="text-sm">Dados básicos do proprietário</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 card-content-form">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-60 sm:max-h-72 overflow-y-auto custom-scrollbar-form">
+          </CardHeader>          
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
               <FormField
                 control={form.control}
                 name="type"
@@ -187,28 +185,26 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
+        <Card>          <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Imóveis Associados</CardTitle>
             <CardDescription className="text-sm">Selecione os imóveis que pertencem a este proprietário</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 card-content-form">
+          <CardContent>
             <FormField
               control={form.control}
               name="properties"
               render={() => (
                 <FormItem>
-                  <div className="grid grid-cols-1 gap-3 max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar-form">
+                  <div className="max-h-48 overflow-y-auto custom-scrollbar">
                     {properties.map((property) => (
                       <FormField
                         key={property.id}
                         control={form.control}
                         name="properties"
                         render={({ field }) => {
-                          return (
-                            <FormItem
+                          return (                            <FormItem
                               key={property.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
+                              className="flex flex-row items-start space-x-3 space-y-0 mb-3"
                             >
                               <FormControl>
                                 <Checkbox
@@ -245,13 +241,12 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
+        <Card>          <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Acesso à Plataforma</CardTitle>
             <CardDescription className="text-sm">Defina as credenciais de acesso</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 card-content-form">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar-form">
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
               <FormField
                 control={form.control}
                 name="username"
@@ -286,9 +281,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
               />
             </div>
           </CardContent>
-        </Card>
-
-        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4">
+        </Card>        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 pb-4">
           <Button type="button" variant="outline" onClick={onSuccess} className="w-full sm:w-auto text-sm">
             Cancelar
           </Button>

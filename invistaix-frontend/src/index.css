@@ -137,6 +137,12 @@
     height: 100vh;
     max-height: 100vh;
     border-radius: 0;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  
+  .dialog-content > div {
+    padding-bottom: 80px; /* Espaço extra no final para dispositivos móveis */
   }
 }
 
@@ -151,6 +157,128 @@ select:focus-visible {
   z-index: 1;
 }
 
+/* Estilo para mensagens de erro do formulário para evitar deslocamento do layout */
+.form-message-container {
+  min-height: 20px; /* Altura mínima para acomodar mensagens de erro */
+  position: relative;
+  margin-top: 4px;
+}
+
+/* Posicionamento fixo de mensagens de erro */
+.form-item-spacing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Estilos específicos para o formulário de proprietário */
+.form-field-container label {
+  margin-bottom: 4px;
+}
+
+.form-field-container .form-message-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  min-height: 20px;
+}
+
+/* Garantir que o controle do formulário não se mova quando há erro */
+.form-field-container .form-control {
+  margin-bottom: 24px; /* Espaço para mensagem de erro */
+}
+
+/* Garantir que os elementos não saiam do grid com a aparição da mensagem de erro */
+.form-grid {
+  display: grid;
+  grid-template-rows: auto;
+  grid-auto-rows: minmax(min-content, max-content);
+  row-gap: 24px !important; /* Aumentar o espaçamento entre as linhas */
+  padding-bottom: 10px; /* Espaço adicional para as mensagens de erro */
+}
+
+/* Estilos específicos para o formulário de proprietários */
+.proprietario-form .form-field-container {
+  margin-bottom: 8px;
+  position: relative;
+}
+
+/* Ajuste para garantir que as mensagens de erro não causem sobreposição */
+.proprietario-form .form-message-container {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  min-height: 20px;
+  z-index: 10;
+  max-width: 100%; /* Garante que não ultrapasse a largura do container pai */
+}
+
+/* Ajuste para formulários dentro de diálogos */
+.proprietario-form .form-field-container {
+  min-height: 65px; /* Altura menor para diálogos */
+}
+
+/* Ajustar espaçamentos para garantir consistência */
+.proprietario-form .form-item-spacing {
+  min-height: 70px;
+  margin-bottom: 10px;
+}
+
+/* Garantir espaço adequado para a mensagem de erro */
+.proprietario-form .form-control {
+  margin-bottom: 20px;
+}
+
+/* Garantir que as mensagens de erro não afetem o layout */
+.form-message-container {
+  height: 20px;
+  overflow: visible;
+  position: relative;
+  z-index: 5;
+}
+
+/* Garantir que os campos e as mensagens de validação não se sobreponham */
+.proprietario-form .form-grid {
+  row-gap: 30px !important;
+  column-gap: 16px !important;
+  margin-bottom: 10px;
+}
+
+/* Estilo para campos obrigatórios */
+.required-field::after {
+  content: "*";
+  color: hsl(var(--destructive));
+  margin-left: 4px;
+}
+
+/* Ajuste para todos os formulários em diálogos */
+.dialog-form .grid {
+  row-gap: 30px !important;
+}
+
+/* Estilo para a lista de imóveis associados */
+.proprietario-form .max-h-48 {
+  max-height: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.02);
+  margin-bottom: 10px;
+}
+
+/* Altura máxima para o diálogo completo */
+.dialog-content {
+  max-height: 95vh; /* Altura máxima de 95% da viewport */
+  overflow-y: auto; /* Permitir scroll no diálogo inteiro */
+}
+
+/* Ajuste para cards dentro do formulário */
+.proprietario-form .card {
+  margin-bottom: 16px;
+  overflow: visible;
+}
+
 /* Estilo específico para inputs do shadcn/ui */
 .relative input:focus-visible {
   outline: none !important;
@@ -163,6 +291,8 @@ select:focus-visible {
   padding-right: 8px !important;
   padding-top: 20px !important;
   padding-bottom: 20px !important;
+  max-height: 300px !important; /* Limitar altura máxima para permitir scroll */
+  overflow-y: auto !important; /* Permitir scroll vertical */
 }
 
 @media (min-width: 640px) {
@@ -182,6 +312,7 @@ select:focus-visible {
   margin: -3px;
   overflow-x: visible !important;
   -webkit-overflow-scrolling: touch;
+  overflow-y: auto !important; /* Permitir scrolling vertical */
 }
 
 .custom-scrollbar-form::-webkit-scrollbar {
@@ -235,15 +366,30 @@ select:focus-visible {
   overflow: visible !important;
 }
 
-/* Adicionar espaço extra para acomodar o focus ring */
+/* Adicionar espaço extra para acomodar o focus ring e garantir altura consistente */
 .form-field-container {
   margin: 3px;
   padding: 3px;
+  min-height: 80px; /* Altura mínima para acomodar o campo e mensagem de erro */
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 640px) {
   .form-field-container {
     margin: 4px;
     padding: 4px;
+    min-height: 85px; /* Ligeiramente maior em telas maiores */
   }
+}
+
+/* Estilos específicos para checkboxes em listas */
+.custom-scrollbar {
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
+  margin-bottom: 10px;
 }
