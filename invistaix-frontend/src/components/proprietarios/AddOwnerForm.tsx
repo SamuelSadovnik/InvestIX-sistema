@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { criarProprietario } from '@/services/proprietarioService';
 import {
   Form,
   FormControl,
@@ -26,13 +26,13 @@ import { toast } from 'sonner';
 import { properties } from '@/data/mockData';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   type: z.enum(['PF', 'PJ'], {
     required_error: 'Selecione o tipo de pessoa',
   }),
-  document: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
+  cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
-  phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   properties: z.array(z.string()).optional(),
 });
 
@@ -48,10 +48,10 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      document: '',
+      nome: '',
+      cpfCnpj: '',
       email: '',
-      phone: '',
+      telefone: '',
       properties: [],
     },
   });
@@ -59,29 +59,21 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // Simular criação do proprietário
-      const newOwner = {
-        id: Date.now().toString(),
-        name: data.name,
-        type: data.type,
-        document: data.document,
-        email: data.email,
-        phone: data.phone,
-      };
-
-      console.log('Novo proprietário criado:', newOwner);
-      console.log('Imóveis associados:', data.properties);
-      
+      await criarProprietario({
+        ...data
+      });
       toast.success('Proprietário cadastrado com sucesso!');
       form.reset();
       onSuccess();
-    } catch (error) {
-      toast.error('Erro ao cadastrar proprietário');
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao cadastrar proprietário');
       console.error('Erro:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+
 
   return (
     <Form {...form}>
@@ -117,7 +109,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
 
               <FormField
                 control={form.control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome Completo</FormLabel>
@@ -131,7 +123,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
 
               <FormField
                 control={form.control}
-                name="document"
+                name="cpfCnpj"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>CPF/CNPJ</FormLabel>
@@ -159,7 +151,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="telefone"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
                     <FormLabel>Telefone</FormLabel>
