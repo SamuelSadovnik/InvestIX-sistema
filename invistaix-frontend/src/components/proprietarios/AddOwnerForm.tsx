@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,17 +27,29 @@ import { toast } from 'sonner';
 import { properties } from '@/data/mockData';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  name: z.string().min(2, {
+    message: "Nome deve ter pelo menos 2 caracteres.",
+  }),
   type: z.enum(['PF', 'PJ'], {
     required_error: 'Selecione o tipo de pessoa',
   }),
-  document: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
-  email: z.string().email('Email inválido'),
-  phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  document: z.string().min(11, {
+    message: "Documento deve ter pelo menos 11 caracteres.",
+  }),
+  email: z.string().email({
+    message: "Por favor, insira um email válido.",
+  }),
+  phone: z.string().min(10, {
+    message: "Telefone deve ter pelo menos 10 caracteres.",
+  }),
+  username: z.string().min(3, {
+    message: "Usuário deve ter pelo menos 3 caracteres.",
+  }),
+  password: z.string().min(6, {
+    message: "Senha deve ter pelo menos 6 caracteres.",
+  }),
   properties: z.array(z.string()).optional(),
 });
-
-type FormData = z.infer<typeof formSchema>;
 
 interface AddOwnerFormProps {
   onSuccess: () => void;
@@ -44,36 +57,40 @@ interface AddOwnerFormProps {
 
 const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<FormData>({
+  
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      document: '',
-      email: '',
-      phone: '',
+      name: "",
+      type: undefined,
+      document: "",
+      email: "",
+      phone: "",
+      username: "",
+      password: "",
       properties: [],
     },
   });
 
-  const onSubmit = async (data: FormData) => {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
       // Simular criação do proprietário
       const newOwner = {
         id: Date.now().toString(),
-        name: data.name,
-        type: data.type,
-        document: data.document,
-        email: data.email,
-        phone: data.phone,
+        name: values.name,
+        type: values.type,
+        document: values.document,
+        email: values.email,
+        phone: values.phone,
+        username: values.username,
       };
 
       console.log('Novo proprietário criado:', newOwner);
-      console.log('Imóveis associados:', data.properties);
+      console.log('Imóveis associados:', values.properties);
       
-      toast.success('Proprietário cadastrado com sucesso!');
       form.reset();
+      toast.success('Proprietário cadastrado com sucesso!');
       onSuccess();
     } catch (error) {
       toast.error('Erro ao cadastrar proprietário');
@@ -82,26 +99,24 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
       setIsSubmitting(false);
     }
   };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Pessoais</CardTitle>
-            <CardDescription>Dados básicos do proprietário</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6 proprietario-form">
+        <Card>          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Informações Pessoais</CardTitle>
+            <CardDescription className="text-sm">Dados básicos do proprietário</CardDescription>
+          </CardHeader>          
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
               <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Tipo</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="text-sm">
                           <SelectValue placeholder="Selecione o tipo" />
                         </SelectTrigger>
                       </FormControl>
@@ -114,57 +129,53 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Nome completo</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do proprietário" {...field} />
+                      <Input placeholder="Nome do proprietário" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="document"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CPF/CNPJ</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">CPF/CNPJ</FormLabel>
                     <FormControl>
-                      <Input placeholder="000.000.000-00" {...field} />
+                      <Input placeholder="000.000.000-00" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="email@exemplo.com" {...field} />
+                      <Input type="email" placeholder="email@exemplo.com" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>Telefone</FormLabel>
+                  <FormItem className="sm:col-span-2 form-field-container">
+                    <FormLabel className="text-sm">Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(00) 00000-0000" {...field} />
+                      <Input placeholder="(00) 00000-0000" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -174,10 +185,9 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Imóveis Associados</CardTitle>
-            <CardDescription>Selecione os imóveis que pertencem a este proprietário</CardDescription>
+        <Card>          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Imóveis Associados</CardTitle>
+            <CardDescription className="text-sm">Selecione os imóveis que pertencem a este proprietário</CardDescription>
           </CardHeader>
           <CardContent>
             <FormField
@@ -185,17 +195,16 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
               name="properties"
               render={() => (
                 <FormItem>
-                  <div className="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto">
+                  <div className="max-h-48 overflow-y-auto custom-scrollbar">
                     {properties.map((property) => (
                       <FormField
                         key={property.id}
                         control={form.control}
                         name="properties"
                         render={({ field }) => {
-                          return (
-                            <FormItem
+                          return (                            <FormItem
                               key={property.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
+                              className="flex flex-row items-start space-x-3 space-y-0 mb-3"
                             >
                               <FormControl>
                                 <Checkbox
@@ -232,8 +241,51 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end gap-3">
-          <Button type="submit" disabled={isSubmitting} className="bg-primary">
+        <Card>          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Acesso à Plataforma</CardTitle>
+            <CardDescription className="text-sm">Defina as credenciais de acesso</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Usuário</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome de usuário para login" {...field} className="text-sm" />
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      Nome que será usado para acessar o sistema
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Senha</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Digite uma senha segura" {...field} className="text-sm" />
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      Senha com pelo menos 6 caracteres
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 pb-4">
+          <Button type="button" variant="outline" onClick={onSuccess} className="w-full sm:w-auto text-sm">
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto bg-primary invistaix-gradient text-sm">
             {isSubmitting ? 'Cadastrando...' : 'Cadastrar Proprietário'}
           </Button>
         </div>

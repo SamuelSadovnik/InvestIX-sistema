@@ -88,10 +88,9 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
           <DialogDescription>
             Altere os dados do proprietário conforme necessário.
           </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </DialogHeader>        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 proprietario-form">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 form-grid">
               <FormField
                 control={form.control}
                 name="type"
