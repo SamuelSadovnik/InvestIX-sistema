@@ -20,12 +20,9 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Inte
 
     @Query("SELECT COUNT(i) FROM Imovel i WHERE i.proprietario.id = :proprietarioId")
     Long countByProprietarioId(@Param("proprietarioId") Long proprietarioId);
-    // Buscar proprietário por email
+
     Optional<Proprietario> findByEmail(String email);
-
-    // Buscar proprietário por telefone
     Optional<Proprietario> findByTelefone(String telefone);
-
-    // Buscar proprietário por CPF/CNPJ
     Optional<Proprietario> findByCpfCnpj(String cpfCnpj);
+    boolean existsByEmail(String email);
 }

@@ -107,11 +107,10 @@ export default function Gestores() {
               <Plus className="h-4 w-4 mr-2" />
               Cadastrar Gestor
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Cadastrar Novo Gestor</DialogTitle>
-              <DialogDescription>
+          </DialogTrigger>          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-2 sm:pb-4">
+              <DialogTitle className="text-lg sm:text-xl">Cadastrar Novo Gestor</DialogTitle>
+              <DialogDescription className="text-sm">
                 Preencha os dados do gestor para adicioná-lo à equipe.
               </DialogDescription>
             </DialogHeader>
