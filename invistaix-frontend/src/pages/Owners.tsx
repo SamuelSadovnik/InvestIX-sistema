@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Plus, 
@@ -28,7 +27,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { owners, properties } from '@/data/mockData';
 import { 
   Dialog, 
   DialogContent, 
@@ -37,19 +35,84 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from '@/components/ui/dialog';
+import { listarProprietarios, Proprietario } from '@/services/proprietarioService';
+import AddOwnerForm from '@/components/AddOwnerForm';
 
 const Owners = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [ownerType, setOwnerType] = useState<string | undefined>(undefined);
+  const [owners, setOwners] = useState<Proprietario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
+  // Busca proprietários do backend
+  useEffect(() => {
+    const fetchOwners = async () => {
+      try {
+        console.log("Iniciando busca de proprietários...");
+        const data = await listarProprietarios();
+        console.log("Dados recebidos do backend:", data);
+        setOwners(data);
+        setError(null);
+      } catch (err) {
+        console.error("Erro ao buscar proprietários:", err);
+        setError('Erro ao carregar proprietários. Tente novamente mais tarde.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchOwners();
+  }, []);
+
   const filteredOwners = owners.filter(owner => {
-    const matchesSearch = owner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = owner.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           owner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          owner.document.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !ownerType || owner.type === ownerType;
+                          owner.cpfCnpj.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Determina o tipo pelo comprimento do documento
+    const tipo = owner.cpfCnpj.length === 11 ? 'PF' : 'PJ';
+    const matchesType = !ownerType || tipo === ownerType;
     
     return matchesSearch && matchesType;
   });
+
+  const formatarDocumento = (doc: string) => {
+    if (doc.length === 11) {
+      return doc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    } else if (doc.length === 14) {
+      return doc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    }
+    return doc;
+  };
+
+  const formatarTelefone = (tel: string) => {
+    const cleaned = tel.replace(/\D/g, '');
+    if (cleaned.length === 11) {
+      return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  };
+
+  const handleOwnerCreated = (newOwner: Proprietario) => {
+    setOwners(prev => [...prev, newOwner]);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p>Carregando proprietários...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -72,11 +135,7 @@ const Owners = () => {
                 Preencha os dados do proprietário para adicioná-lo ao sistema.
               </DialogDescription>
             </DialogHeader>
-            <div className="p-4">
-              <p className="text-center text-muted-foreground">
-                Formulário de cadastro seria implementado aqui
-              </p>
-            </div>
+            <AddOwnerForm onSuccess={handleOwnerCreated} />
           </DialogContent>
         </Dialog>
       </div>
@@ -111,28 +170,34 @@ const Owners = () => {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredOwners.length > 0 ? (
           filteredOwners.map((owner) => {
-            const ownerProperties = properties.filter(p => p.owner === owner.id);
+            const tipo = owner.cpfCnpj.length === 11 ? 'PF' : 'PJ';
+            
             return (
               <Card key={owner.id} className="hover-scale">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
-                    <CardTitle>{owner.name}</CardTitle>
+                    <CardTitle>{owner.nome}</CardTitle>
                     <Badge 
-                      className={owner.type === 'PF' ? 'bg-invistaix-100 text-invistaix-400 hover:bg-invistaix-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}
+                      className={tipo === 'PF' ? 'bg-invistaix-100 text-invistaix-400 hover:bg-invistaix-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}
                     >
-                      {owner.type === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}
+                      {tipo === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}
                     </Badge>
                   </div>
                   <CardDescription className="flex items-center mt-1">
                     <Building className="h-3 w-3 mr-1" />
-                    {ownerProperties.length} imóvel(is)
+                      <span>{owner.quantidadeImoveis} imóvel(is)</span>
+                  </CardDescription>
+                  <CardDescription className="flex items-center mt-1">
+                    <Building className="h-3 w-3 mr-1" />
+                    {/* Contagem de imóveis será implementada posteriormente */}
+                    Informações de imóveis a implementar
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm">
                       <UserCheck className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span>{owner.document}</span>
+                      <span>{formatarDocumento(owner.cpfCnpj)}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -140,7 +205,7 @@ const Owners = () => {
                     </div>
                     <div className="flex items-center text-sm">
                       <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span>{owner.phone}</span>
+                      <span>{formatarTelefone(owner.telefone)}</span>
                     </div>
                   </div>
                 </CardContent>
