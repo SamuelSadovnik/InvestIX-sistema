@@ -37,9 +37,9 @@ public class DataInitializer implements CommandLineRunner {
             Admin admin = new Admin();
             admin.setNome("Administrador Sistema");
             admin.setEmail("admin@sistema.com");
-            admin.setSenha(passwordEncoderUtil.encodePassword("123456"));
+            admin.setSenha(passwordEncoderUtil.encodePassword("123"));
             adminRepository.save(admin);
-            System.out.println("✅ Admin criado: admin@sistema.com / 123456");
+            System.out.println("✅ Admin criado: admin@sistema.com / 123");
         }
         
         // Criar gestor de teste se não existir
@@ -48,9 +48,9 @@ public class DataInitializer implements CommandLineRunner {
             gestor.setNome("João Silva");
             gestor.setEmail("gestor@sistema.com");
             gestor.setCpf("12345678901");
-            gestor.setSenha(passwordEncoderUtil.encodePassword("123456"));
+            gestor.setSenha(passwordEncoderUtil.encodePassword("123"));
             gestorRepository.save(gestor);
-            System.out.println("✅ Gestor criado: gestor@sistema.com / 123456");
+            System.out.println("✅ Gestor criado: gestor@sistema.com / 123");
         }
         
         // Criar proprietário de teste se não existir
@@ -60,9 +60,9 @@ public class DataInitializer implements CommandLineRunner {
             proprietario.setEmail("proprietario@sistema.com");
             proprietario.setTelefone("11999999999");
             proprietario.setCpfCnpj("98765432100");
-            proprietario.setSenha(passwordEncoderUtil.encodePassword("123456"));
+            proprietario.setSenha(passwordEncoderUtil.encodePassword("123"));
             proprietarioRepository.save(proprietario);
-            System.out.println("✅ Proprietário criado: proprietario@sistema.com / 123456");
+            System.out.println("✅ Proprietário criado: proprietario@sistema.com / 123");
         }
         
         System.out.println("🔐 Inicialização de usuários concluída!");
