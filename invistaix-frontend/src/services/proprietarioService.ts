@@ -9,18 +9,23 @@ export interface Proprietario {
   quantidadeImoveis: number;
 }
 
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+  };
+}
+
 export const listarProprietarios = async (): Promise<Proprietario[]> => {
   try {
     const response = await fetch(`${API_URL}/proprietarios`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erro ao buscar proprietários');
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
     }
 
     return await response.json();
@@ -30,19 +35,16 @@ export const listarProprietarios = async (): Promise<Proprietario[]> => {
   }
 };
 
-export const criarProprietario = async (proprietarioData) => {
+export const criarProprietario = async (proprietarioData): Promise<Proprietario> => {
   try {
     const response = await fetch(`${API_URL}/proprietarios`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(proprietarioData),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erro ao cadastrar proprietário');
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
     }
 
     return await response.json();
@@ -56,14 +58,11 @@ export const deletarProprietario = async (id: number): Promise<void> => {
   try {
     const response = await fetch(`${API_URL}/proprietarios/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erro ao deletar proprietário');
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
     }
   } catch (error) {
     console.error('Erro na requisição:', error);
@@ -71,18 +70,21 @@ export const deletarProprietario = async (id: number): Promise<void> => {
   }
 };
 
-export async function atualizarProprietario(id: number, dadosAtualizados: any) {
-  const response = await fetch(`${API_URL}/proprietarios/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(dadosAtualizados),
-  });
+export const atualizarProprietario = async (id: number, dadosAtualizados: any): Promise<Proprietario> => {
+  try {
+    const response = await fetch(`${API_URL}/proprietarios/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(dadosAtualizados),
+    });
 
-  if (!response.ok) {
-    throw new Error('Erro ao atualizar proprietário');
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
   }
-
-  return await response.json();
-}
+};

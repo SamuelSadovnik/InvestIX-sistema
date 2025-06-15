@@ -3,9 +3,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface AuthContextType {
   isAuthenticated: boolean;
   userType: 'admin' | 'gestor' | 'proprietario' | null;
-  login: (username: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -21,47 +22,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userType, setUserType] = useState<'admin' | 'gestor' | 'proprietario' | null>(null);
 
-  //   useEffect(() => {
-  //     const savedAuth = localStorage.getItem('isAuthenticated');
-  //     const savedType = localStorage.getItem('userType');
-  //     if (savedAuth === 'true' && savedType) {
-  //       setIsAuthenticated(true);
-  //       setUserType(savedType as any);
-  //     }
-  //   }, []);
-  const login = (username: string, password: string): boolean => {
-    if (username === 'admin' && password === '123') {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const tipo = localStorage.getItem('userType');
+    if (token && tipo) {
       setIsAuthenticated(true);
-      setUserType('admin');
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userType', 'admin');
-      localStorage.setItem('username', 'admin');
-      return true;
+      setUserType(tipo as 'admin' | 'gestor' | 'proprietario');
     }
-    if (username === 'gestor' && password === '123') {
+  }, []);
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('http://localhost:8080/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      const tipo = data.user.userType.toLowerCase() as 'admin' | 'gestor' | 'proprietario';
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userType', tipo);
+      localStorage.setItem('email', email);
+
       setIsAuthenticated(true);
-      setUserType('gestor');
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userType', 'gestor');
-      localStorage.setItem('username', 'gestor');
+      setUserType(tipo);
       return true;
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      return false;
     }
-    if (username === 'proprietario' && password === '123') {
-      setIsAuthenticated(true);
-      setUserType('proprietario');
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userType', 'proprietario');
-      localStorage.setItem('username', 'proprietario');
-      return true;
-    }
-    return false;
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUserType(null);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userType');
+  setIsAuthenticated(false);
+  setUserType(null);
+  localStorage.clear();
   };
 
   return (

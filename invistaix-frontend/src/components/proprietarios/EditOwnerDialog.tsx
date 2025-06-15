@@ -31,9 +31,6 @@ import { toast } from 'sonner';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  type: z.enum(['PF', 'PJ'], {
-    required_error: 'Selecione o tipo de pessoa',
-  }),
   cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
@@ -86,28 +83,6 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
         </DialogHeader>        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 proprietario-form">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 form-grid">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="PF">Pessoa Física</SelectItem>
-                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="nome"

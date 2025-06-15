@@ -19,10 +19,10 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:minha-chave-secreta-muito-segura-para-jwt-precisa-ser-longa}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration:86400000}")
+    @Value("${jwt.expiration}")
     private long jwtExpiration;
 
     private SecretKey getSigningKey() {
@@ -42,8 +42,9 @@ public class JwtUtil {
             .subject(user.getEmail())
             .issuedAt(new Date())
             .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-            .signWith(getSigningKey())
+            .signWith(getSigningKey(), Jwts.SIG.HS512)  // <-- Algoritmo explícito
             .compact();
+
     }
 
     public String getEmailFromToken(String token) {
@@ -75,6 +76,7 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+
         } catch (JwtException e) {
             throw new RuntimeException("Token JWT inválido", e);
         }

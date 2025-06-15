@@ -17,10 +17,10 @@ public class Gestor {
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name = "CPF", nullable = false, length = 11, unique = true)
+    @Column(name = "CPF", nullable = true, length = 11, unique = true)
     private String cpf;
 
-    @Column(name = "senha", nullable = false, length = 64)
+    @Column(name = "senha", nullable = true, length = 64)
     private String senha;
 
     // Construtores

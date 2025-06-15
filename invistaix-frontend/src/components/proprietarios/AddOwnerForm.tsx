@@ -85,7 +85,8 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6 proprietario-form">
-        <Card>          <CardHeader className="pb-3 sm:pb-6">
+        <Card>          
+          <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Informações Pessoais</CardTitle>
             <CardDescription className="text-sm">Dados básicos do proprietário</CardDescription>
           </CardHeader>          
