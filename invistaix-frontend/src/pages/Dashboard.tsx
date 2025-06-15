@@ -42,13 +42,13 @@ const Dashboard = () => {
   let welcomeDesc = '';
   let boxClass = 'bg-green-50 border border-green-200';
 
-  if (userType === 'admin') {
+  if (userType === 'ADMIN') {
     welcomeTitle = 'Bem-vindo, Administrador!';
     welcomeDesc = 'Você possui controle total do sistema.';
-  } else if (userType === 'gestor') {
+  } else if (userType === 'GESTOR') {
     welcomeTitle = 'Bem-vindo, Gestor!';
     welcomeDesc = 'Gerencie imóveis, receitas e despesas.';
-  } else if (userType === 'proprietario') {
+  } else if (userType === 'PROPRIETARIO') {
     welcomeTitle = 'Bem-vindo, Proprietário!';
     welcomeDesc = 'Veja seus imóveis e receitas.';
   }
@@ -80,14 +80,16 @@ const Dashboard = () => {
       <div className={`rounded-lg p-6 mb-6 ${boxClass}`}> 
         <h2 className="text-2xl font-semibold mb-1">{welcomeTitle}</h2>
         <p className="text-muted-foreground">{welcomeDesc}</p>
-      </div>      <div className={`grid gap-4 ${
-        userType === 'proprietario' 
+      </div>
+      
+      <div className={`grid gap-4 ${
+        userType === 'PROPRIETARIO' 
           ? 'md:grid-cols-2' 
-          : userType === 'gestor'
+          : userType === 'GESTOR'
           ? 'md:grid-cols-4'
           : 'md:grid-cols-2 lg:grid-cols-4'
       }`}>
-        <div className={userType === 'gestor' ? 'md:col-span-2' : ''}>
+        <div className={userType === 'GESTOR' ? 'md:col-span-2' : ''}>
           <DashboardCard
             title="Total de Imóveis"
             value={totalProperties}
@@ -96,7 +98,7 @@ const Dashboard = () => {
             trend={{ value: 20, isPositive: true }}
           />
         </div>
-        {userType !== 'proprietario' && (
+        {userType !== 'PROPRIETARIO' && (
           <DashboardCard
             title="Total de Proprietários"
             value={totalOwners}
@@ -105,7 +107,7 @@ const Dashboard = () => {
             trend={{ value: 5, isPositive: true }}
           />
         )}
-        {userType === 'admin' && (
+        {userType === 'ADMIN' && (
           <DashboardCard
             title="Total de Gestores"
             value={totalManagers}
