@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -21,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { DialogFooter } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,8 +32,11 @@ const formSchema = z.object({
   phone: z.string().min(10, {
     message: "Telefone deve ter pelo menos 10 caracteres.",
   }),
-  role: z.string().min(2, {
-    message: "Função deve ter pelo menos 2 caracteres.",
+  username: z.string().min(3, {
+    message: "Usuário deve ter pelo menos 3 caracteres.",
+  }),
+  password: z.string().min(6, {
+    message: "Senha deve ter pelo menos 6 caracteres.",
   }),
 });
 
@@ -44,39 +46,50 @@ interface AddManagerFormProps {
 }
 
 export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCancel }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      role: "",
+      username: "",
+      password: "",
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(values);
-    form.reset();
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
+    try {
+      onSubmit(values);
+      form.reset();
+      toast.success('Gestor cadastrado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao cadastrar gestor');
+      console.error('Erro:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="grid gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Informações Pessoais</CardTitle>
-              <CardDescription>Dados do gestor</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6">
+        <Card>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Informações Pessoais</CardTitle>
+            <CardDescription className="text-sm">Dados básicos do gestor</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 card-content-form">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-60 sm:max-h-72 overflow-y-auto custom-scrollbar-form">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome completo</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Nome completo</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do gestor" {...field} />
+                      <Input placeholder="Nome do gestor" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,10 +99,10 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="email@exemplo.com" {...field} />
+                      <Input type="email" placeholder="email@exemplo.com" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -99,52 +112,70 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Telefone</FormLabel>
+                  <FormItem className="sm:col-span-2 form-field-container">
+                    <FormLabel className="text-sm">Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(00) 00000-0000" {...field} />
+                      <Input placeholder="(00) 00000-0000" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Acesso à Plataforma</CardTitle>
-              <CardDescription>Defina as permissões de acesso</CardDescription>
-            </CardHeader>
-            <CardContent>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Acesso à Plataforma</CardTitle>
+            <CardDescription className="text-sm">Defina as credenciais de acesso</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 card-content-form">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar-form">
               <FormField
                 control={form.control}
-                name="role"
+                name="username"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Função</FormLabel>
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Usuário</FormLabel>
                     <FormControl>
-                      <Input placeholder="Gestor de portfólio" {...field} />
+                      <Input placeholder="Nome de usuário para login" {...field} className="text-sm" />
                     </FormControl>
-                    <FormDescription>
-                      Ex: Gestor de portfólio, Administrador, etc.
+                    <FormDescription className="text-xs">
+                      Nome que será usado para acessar o sistema
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </CardContent>
-          </Card>
-        </div>
-        
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onCancel}>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="form-field-container">
+                    <FormLabel className="text-sm">Senha</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Digite uma senha segura" {...field} className="text-sm" />
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      Senha com pelo menos 6 caracteres
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4">
+          <Button type="button" variant="outline" onClick={onCancel} className="w-full sm:w-auto text-sm">
             Cancelar
           </Button>
-          <Button type="submit">
-            Salvar Gestor
+          <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto bg-primary invistaix-gradient text-sm">
+            {isSubmitting ? 'Cadastrando...' : 'Cadastrar Gestor'}
           </Button>
-        </DialogFooter>
+        </div>
       </form>
     </Form>
   );

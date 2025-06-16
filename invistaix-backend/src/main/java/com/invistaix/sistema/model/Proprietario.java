@@ -23,20 +23,22 @@ public class Proprietario {
     @Column(name = "cpf_cnpj", nullable = false, length = 14, unique = true)
     private String cpfCnpj;
 
-    @Column(name = "senha", nullable = false, length = 64)
+    @Column(name = "senha", nullable = true, length = 64)
     private String senha;
+
+    private Long quantidadeImoveis;
 
     // Construtores
     public Proprietario() {
     }
 
-    public Proprietario(Integer id, String nome, String email, String telefone, String cpfCnpj, String senha) {
+    public Proprietario(Integer id, String nome, String email, String telefone, String cpfCnpj, Long quantidadeImoveis) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.telefone = telefone;
         this.cpfCnpj = cpfCnpj;
-        this.senha = senha;
+        this.quantidadeImoveis = quantidadeImoveis;
     }
 
     // Getters e Setters
@@ -54,6 +56,14 @@ public class Proprietario {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getSenha(){
+        return senha;
+    }
+
+    public void setSenha(String senha){
+        this.senha = senha;
     }
 
     public String getEmail() {
@@ -80,11 +90,11 @@ public class Proprietario {
         this.cpfCnpj = cpfCnpj;
     }
 
-    public String getSenha() {
-        return senha;
+    public Long getQuantidadeImoveis() {
+        return quantidadeImoveis;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setQuantidadeImoveis(Long quantidadeImoveis) {
+        this.quantidadeImoveis = quantidadeImoveis;
     }
 }

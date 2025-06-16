@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   UserPlus, 
@@ -107,11 +106,10 @@ export default function Gestores() {
               <Plus className="h-4 w-4 mr-2" />
               Cadastrar Gestor
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Cadastrar Novo Gestor</DialogTitle>
-              <DialogDescription>
+          </DialogTrigger>          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-2 sm:pb-4">
+              <DialogTitle className="text-lg sm:text-xl">Cadastrar Novo Gestor</DialogTitle>
+              <DialogDescription className="text-sm">
                 Preencha os dados do gestor para adicioná-lo à equipe.
               </DialogDescription>
             </DialogHeader>
@@ -142,9 +140,7 @@ export default function Gestores() {
               <TableHead>Nome</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Telefone</TableHead>
-              <TableHead>Função</TableHead>
               <TableHead>Imóveis Gerenciados</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -159,19 +155,11 @@ export default function Gestores() {
                     <TableCell className="font-medium">{manager.name}</TableCell>
                     <TableCell>{manager.email}</TableCell>
                     <TableCell>{manager.phone}</TableCell>
-                    <TableCell>{manager.role || 'Gestor'}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Building className="h-4 w-4 mr-1 text-muted-foreground" />
                         <span>{managerProperties.length}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {manager.isOwner && (
-                        <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-                          Também Proprietário
-                        </Badge>
-                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -204,7 +192,7 @@ export default function Gestores() {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10">
+                <TableCell colSpan={5} className="text-center py-10">
                   <div className="flex flex-col items-center justify-center">
                     <UserPlus className="h-12 w-12 text-muted-foreground/50 mb-4" />
                     <h3 className="text-lg font-medium">Nenhum gestor encontrado</h3>

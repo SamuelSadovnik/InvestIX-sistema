@@ -1,14 +1,13 @@
 package com.invistaix.sistema.repository;
 
-import com.invistaix.sistema.model.Gestor;
+import com.invistaix.sistema.model.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface GestorRepository extends JpaRepository<Gestor, Integer> {
-    Optional<Gestor> findByEmail(String email);
-    Optional<Gestor> findByCpf(String cpf);
+public interface AdminRepository extends JpaRepository<Admin, Integer> {
+    Optional<Admin> findByEmail(String email);
     boolean existsByEmail(String email);
 }
