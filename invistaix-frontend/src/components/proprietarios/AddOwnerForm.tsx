@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { criarProprietario } from '@/services/proprietarioService';
 import {
   Form,
   FormControl,
@@ -14,34 +14,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { properties } from '@/data/mockData';
 
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Nome deve ter pelo menos 2 caracteres.",
-  }),
-  type: z.enum(['PF', 'PJ'], {
-    required_error: 'Selecione o tipo de pessoa',
-  }),
-  document: z.string().min(11, {
-    message: "Documento deve ter pelo menos 11 caracteres.",
-  }),
-  email: z.string().email({
-    message: "Por favor, insira um email válido.",
-  }),
-  phone: z.string().min(10, {
-    message: "Telefone deve ter pelo menos 10 caracteres.",
-  }),
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
+  email: z.string().email('Email inválido'),
+  telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   username: z.string().min(3, {
     message: "Usuário deve ter pelo menos 3 caracteres.",
   }),
@@ -61,44 +43,30 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      type: undefined,
-      document: "",
-      email: "",
-      phone: "",
+      nome: '',
+      cpfCnpj: '',
+      email: '',
+      telefone: '',
       username: "",
       password: "",
       properties: [],
     },
   });
-
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      // Simular criação do proprietário
-      const newOwner = {
-        id: Date.now().toString(),
-        name: values.name,
-        type: values.type,
-        document: values.document,
-        email: values.email,
-        phone: values.phone,
-        username: values.username,
-      };
-
-      console.log('Novo proprietário criado:', newOwner);
-      console.log('Imóveis associados:', values.properties);
-      
+      await criarProprietario(values);
       form.reset();
       toast.success('Proprietário cadastrado com sucesso!');
       onSuccess();
-    } catch (error) {
-      toast.error('Erro ao cadastrar proprietário');
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao cadastrar proprietário');
       console.error('Erro:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6 proprietario-form">
@@ -110,30 +78,9 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
               <FormField
                 control={form.control}
-                name="type"
+                name="nome"
                 render={({ field }) => (
-                  <FormItem className="form-field-container">
-                    <FormLabel className="text-sm">Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="text-sm">
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="PF">Pessoa Física</SelectItem>
-                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="form-field-container">
+                  <FormItem className="form-field-container sm:col-span-2">
                     <FormLabel className="text-sm">Nome completo</FormLabel>
                     <FormControl>
                       <Input placeholder="Nome do proprietário" {...field} className="text-sm" />
@@ -144,7 +91,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
               />
               <FormField
                 control={form.control}
-                name="document"
+                name="cpfCnpj"
                 render={({ field }) => (
                   <FormItem className="form-field-container">
                     <FormLabel className="text-sm">CPF/CNPJ</FormLabel>
@@ -170,7 +117,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
               />
               <FormField
                 control={form.control}
-                name="phone"
+                name="telefone"
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2 form-field-container">
                     <FormLabel className="text-sm">Telefone</FormLabel>

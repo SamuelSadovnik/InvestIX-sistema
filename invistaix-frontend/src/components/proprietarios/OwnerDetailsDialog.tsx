@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -20,11 +19,11 @@ import { properties } from '@/data/mockData';
 
 interface Owner {
   id: string;
-  name: string;
+  nome: string;
   type: 'PF' | 'PJ';
-  document: string;
+  cpfCnpj: string;
   email: string;
-  phone: string;
+  telefone: string;
 }
 
 interface OwnerDetailsDialogProps {
@@ -38,6 +37,7 @@ export const OwnerDetailsDialog: React.FC<OwnerDetailsDialogProps> = ({
   onClose,
   owner,
 }) => {
+  if (!owner) return null;
   const ownerProperties = properties.filter(p => p.owner === owner.id);
 
   return (
@@ -45,7 +45,7 @@ export const OwnerDetailsDialog: React.FC<OwnerDetailsDialogProps> = ({
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            {owner.name}
+            {owner.nome}
             <Badge 
               className={owner.type === 'PF' ? 'bg-invistaix-100 text-invistaix-400 hover:bg-invistaix-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}
             >
@@ -66,7 +66,7 @@ export const OwnerDetailsDialog: React.FC<OwnerDetailsDialogProps> = ({
               <div className="flex items-center text-sm">
                 <UserCheck className="h-4 w-4 mr-3 text-muted-foreground" />
                 <span className="font-medium mr-2">Documento:</span>
-                <span>{owner.document}</span>
+                <span>{owner.cpfCnpj}</span>
               </div>
               <div className="flex items-center text-sm">
                 <Mail className="h-4 w-4 mr-3 text-muted-foreground" />
@@ -76,7 +76,7 @@ export const OwnerDetailsDialog: React.FC<OwnerDetailsDialogProps> = ({
               <div className="flex items-center text-sm">
                 <Phone className="h-4 w-4 mr-3 text-muted-foreground" />
                 <span className="font-medium mr-2">Telefone:</span>
-                <span>{owner.phone}</span>
+                <span>{owner.telefone}</span>
               </div>
             </CardContent>
           </Card>

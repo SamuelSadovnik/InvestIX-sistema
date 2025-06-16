@@ -28,16 +28,6 @@ export interface Property {
   };
 }
 
-export interface Owner {
-  id: string;
-  name: string;
-  type: 'PF' | 'PJ';
-  document: string;
-  email: string;
-  phone: string;
-  properties: string[];
-}
-
 export interface Manager {
   id: string;
   name: string;

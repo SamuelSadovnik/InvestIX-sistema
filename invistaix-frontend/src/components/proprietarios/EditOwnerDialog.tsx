@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import type { Proprietario } from '@/services/proprietarioService';
 import {
   Dialog,
   DialogContent,
@@ -20,40 +20,21 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  type: z.enum(['PF', 'PJ'], {
-    required_error: 'Selecione o tipo de pessoa',
-  }),
-  document: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
-  phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-interface Owner {
-  id: string;
-  name: string;
-  type: 'PF' | 'PJ';
-  document: string;
-  email: string;
-  phone: string;
-}
-
 interface EditOwnerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  owner: Owner;
+  owner: Proprietario | null;  // Alterei para poder tratar null
   onUpdate: (data: FormData) => void;
 }
 
@@ -63,14 +44,17 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
   owner,
   onUpdate,
 }) => {
+  if (!owner) {
+    return null; // Ou um loading spinner, se preferir
+  }
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: owner.name,
-      type: owner.type,
-      document: owner.document,
+      nome: owner.nome,
+      cpfCnpj: owner.cpfCnpj,
       email: owner.email,
-      phone: owner.phone,
+      telefone: owner.telefone,
     },
   });
 
@@ -93,31 +77,9 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 form-grid">
               <FormField
                 control={form.control}
-                name="type"
+                name="nome"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="PF">Pessoa Física</SelectItem>
-                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Nome Completo</FormLabel>
                     <FormControl>
                       <Input placeholder="Nome do proprietário" {...field} />
@@ -129,7 +91,7 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="document"
+                name="cpfCnpj"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>CPF/CNPJ</FormLabel>
@@ -157,7 +119,7 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="telefone"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
                     <FormLabel>Telefone</FormLabel>

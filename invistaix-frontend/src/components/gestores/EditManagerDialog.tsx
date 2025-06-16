@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,7 +25,6 @@ const formSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
   phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
-  role: z.string().min(2, 'Função deve ter pelo menos 2 caracteres'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -36,7 +34,7 @@ interface Manager {
   name: string;
   email: string;
   phone: string;
-  role: string;
+  role?: string;
   properties: string[];
   isOwner?: boolean;
 }
@@ -60,7 +58,6 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
       name: manager.name,
       email: manager.email,
       phone: manager.phone,
-      role: manager.role,
     },
   });
 
@@ -98,20 +95,6 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Função</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Gerente de Locação" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -128,7 +111,7 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
                       <Input placeholder="(00) 00000-0000" {...field} />

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -12,8 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { 
   Building, 
   Mail, 
-  Phone, 
-  User,
+  Phone,
   MapPin
 } from 'lucide-react';
 import { properties } from '@/data/mockData';
@@ -23,7 +21,6 @@ interface Manager {
   name: string;
   email: string;
   phone: string;
-  role: string;
   properties: string[];
   isOwner?: boolean;
 }
@@ -66,11 +63,6 @@ export const ManagerDetailsDialog: React.FC<ManagerDetailsDialogProps> = ({
               <CardTitle className="text-lg">Informações Pessoais</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center text-sm">
-                <User className="h-4 w-4 mr-3 text-muted-foreground" />
-                <span className="font-medium mr-2">Função:</span>
-                <span>{manager.role}</span>
-              </div>
               <div className="flex items-center text-sm">
                 <Mail className="h-4 w-4 mr-3 text-muted-foreground" />
                 <span className="font-medium mr-2">Email:</span>
