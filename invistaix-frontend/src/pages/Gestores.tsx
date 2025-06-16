@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
-import {
-  UserPlus,
-  Plus,
+import { 
+  UserPlus, 
+  Plus, 
   Search,
   Building,
   Edit,
@@ -18,13 +17,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+import { Badge } from '@/components/ui/badge';
+import { properties } from '@/data/mockData';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useManagers } from '@/hooks/useManagers';
@@ -45,31 +45,25 @@ export default function Gestores() {
     isOpen: false,
     manager: null,
   });
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; managerId: number; managerName: string }>({
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; managerId: string; managerName: string }>({
     isOpen: false,
-    managerId: 0,
+    managerId: '',
     managerName: '',
   });
   
-  const { managers, loading, error, addManager, updateManager, deleteManager } = useManagers();
+  const { managers, addManager, updateManager, deleteManager } = useManagers();
   
   const filteredManagers = managers.filter(manager => {
-    const name = manager.name || '';
-    const email = manager.email || '';
-    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          manager.email.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesSearch;
   });
 
-  const handleAddManager = async (data: any) => {
-    try {
-      await addManager(data);
-      setIsAddDialogOpen(false);
-      toast.success(`${data.name} foi adicionado com sucesso.`);
-    } catch (err) {
-      toast.error('Erro ao adicionar gestor');
-    }
+  const handleAddManager = (data: any) => {
+    addManager(data);
+    setIsAddDialogOpen(false);
+    toast.success(`${data.name} foi adicionado com sucesso.`);
   };
 
   const handleEditClick = (manager: any) => {
@@ -80,7 +74,7 @@ export default function Gestores() {
     setDetailsDialog({ isOpen: true, manager });
   };
 
-  const handleDeleteClick = (managerId: number, managerName: string) => {
+  const handleDeleteClick = (managerId: string, managerName: string) => {
     setDeleteDialog({
       isOpen: true,
       managerId,
@@ -88,88 +82,16 @@ export default function Gestores() {
     });
   };
 
-  const handleUpdateManager = async (data: any) => {
-    try {
-      await updateManager(editDialog.manager.id, data);
-      setEditDialog({ isOpen: false, manager: null });
-    } catch (err) {
-      toast.error('Erro ao atualizar gestor');
-    }
+  const handleUpdateManager = (data: any) => {
+    updateManager(editDialog.manager.id, data);
+    setEditDialog({ isOpen: false, manager: null });
   };
 
-  const handleDeleteConfirm = async () => {
-    try {
-      await deleteManager(deleteDialog.managerId);
-      setDeleteDialog({ isOpen: false, managerId: 0, managerName: '' });
-      toast.success(`${deleteDialog.managerName} foi removido com sucesso.`);
-    } catch (err) {
-      toast.error('Erro ao remover gestor');
-    }
+  const handleDeleteConfirm = () => {
+    deleteManager(deleteDialog.managerId);
+    setDeleteDialog({ isOpen: false, managerId: '', managerName: '' });
+    toast.success(`${deleteDialog.managerName} foi removido com sucesso.`);
   };
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Gestores</h1>
-            <p className="text-muted-foreground">Gerencie a equipe de gestores</p>
-          </div>
-          <Button className="invistaix-gradient" disabled>
-            <Plus className="h-4 w-4 mr-2" />
-            Cadastrar Gestor
-          </Button>
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {[...Array(6)].map((_, i) => (
-                    <TableHead key={i}>
-                      <Skeleton className="h-4 w-24" />
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[...Array(5)].map((_, i) => (
-                  <TableRow key={i}>
-                    {[...Array(6)].map((_, j) => (
-                      <TableCell key={j}>
-                        <Skeleton className="h-4 w-full" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Gestores</h1>
-            <p className="text-muted-foreground">Gerencie a equipe de gestores</p>
-          </div>
-          <Button className="invistaix-gradient">
-            <Plus className="h-4 w-4 mr-2" />
-            Cadastrar Gestor
-          </Button>
-        </div>
-        <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -184,15 +106,14 @@ export default function Gestores() {
               <Plus className="h-4 w-4 mr-2" />
               Cadastrar Gestor
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
+          </DialogTrigger>          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader className="pb-2 sm:pb-4">
               <DialogTitle className="text-lg sm:text-xl">Cadastrar Novo Gestor</DialogTitle>
               <DialogDescription className="text-sm">
                 Preencha os dados do gestor para adicioná-lo à equipe.
               </DialogDescription>
             </DialogHeader>
-            <AddManagerForm
+            <AddManagerForm 
               onSubmit={handleAddManager}
               onCancel={() => setIsAddDialogOpen(false)}
             />
@@ -219,43 +140,46 @@ export default function Gestores() {
               <TableHead>Nome</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Telefone</TableHead>
-              <TableHead>Imóveis</TableHead>
+              <TableHead>Imóveis Gerenciados</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredManagers.length > 0 ? (
               filteredManagers.map((manager) => {
+                const managerProperties = properties.filter(p => 
+                  manager.properties.includes(p.id)
+                );
                 return (
                   <TableRow key={manager.id}>
-                    <TableCell className="font-medium">{manager.name || 'N/A'}</TableCell>
-                    <TableCell>{manager.email || 'N/A'}</TableCell>
-                    <TableCell>{manager.phone || 'N/A'}</TableCell>
+                    <TableCell className="font-medium">{manager.name}</TableCell>
+                    <TableCell>{manager.email}</TableCell>
+                    <TableCell>{manager.phone}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Building className="h-4 w-4 mr-1 text-muted-foreground" />
-                        <span>{manager.properties?.length || 0}</span>
+                        <span>{managerProperties.length}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
+                        <Button 
+                          variant="outline" 
                           size="sm"
                           onClick={() => handleDetailsClick(manager)}
                         >
                           Ver Detalhes
                         </Button>
-                        <Button
-                          variant="ghost"
+                        <Button 
+                          variant="ghost" 
                           size="icon"
                           onClick={() => handleEditClick(manager)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
                           className="text-destructive"
                           onClick={() => handleDeleteClick(manager.id, manager.name)}
                         >
@@ -302,7 +226,7 @@ export default function Gestores() {
 
       <DeleteManagerDialog
         isOpen={deleteDialog.isOpen}
-        onClose={() => setDeleteDialog({ isOpen: false, managerId: 0, managerName: '' })}
+        onClose={() => setDeleteDialog({ isOpen: false, managerId: '', managerName: '' })}
         onConfirm={handleDeleteConfirm}
         managerName={deleteDialog.managerName}
       />

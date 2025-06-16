@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { deletarProprietario } from '@/hooks/useProprietarios';
+import { deletarProprietario } from '@/services/proprietarioService';
 
 interface DeleteOwnerDialogProps {
   isOpen: boolean;
@@ -28,8 +28,8 @@ export const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
 }) => {
   const handleConfirm = async () => {
     try {
-      await deletarProprietario(ownerId); 
-      if (onAfterDelete) onAfterDelete();
+      await deletarProprietario(ownerId);
+      if (onAfterDelete) onAfterDelete(); // para atualizar a lista, se necessário
       onClose();
     } catch (error) {
       console.error('Erro ao excluir proprietário:', error);

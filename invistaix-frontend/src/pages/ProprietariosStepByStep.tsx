@@ -15,9 +15,11 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import AddOwnerForm from '@/components/proprietarios/AddOwnerForm';
-import { useOwners } from '@/hooks/useProprietarios';
+import { useOwners } from '@/hooks/useOwners';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProprietariosStepByStep() {
+  const { userType } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { owners } = useOwners();
@@ -39,23 +41,25 @@ export default function ProprietariosStepByStep() {
           </p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="invistaix-gradient">
-              <Plus className="h-4 w-4 mr-2" />
-              Cadastrar Proprietário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
-            <DialogHeader className="pb-2 sm:pb-4">
-              <DialogTitle className="text-lg sm:text-xl">Cadastrar Novo Proprietário</DialogTitle>
-              <DialogDescription className="text-sm">
-                Preencha os dados do proprietário para adicioná-lo ao sistema.
-              </DialogDescription>
-            </DialogHeader>
-            <AddOwnerForm onSuccess={handleFormSuccess} />
-          </DialogContent>
-        </Dialog>
+        {userType === 'admin' && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="invistaix-gradient">
+                <Plus className="h-4 w-4 mr-2" />
+                Cadastrar Proprietário
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
+              <DialogHeader className="pb-2 sm:pb-4">
+                <DialogTitle className="text-lg sm:text-xl">Cadastrar Novo Proprietário</DialogTitle>
+                <DialogDescription className="text-sm">
+                  Preencha os dados do proprietário para adicioná-lo ao sistema.
+                </DialogDescription>
+              </DialogHeader>
+              <AddOwnerForm onSuccess={handleFormSuccess} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">

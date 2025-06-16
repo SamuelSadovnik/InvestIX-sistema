@@ -13,8 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProprietariosSimple() {
+  const { userType } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
@@ -30,10 +32,12 @@ export default function ProprietariosSimple() {
           </p>
         </div>
         
-        <Button className="invistaix-gradient">
-          <Plus className="h-4 w-4 mr-2" />
-          Cadastrar Proprietário
-        </Button>
+        {userType === 'admin' && (
+          <Button className="invistaix-gradient">
+            <Plus className="h-4 w-4 mr-2" />
+            Cadastrar Proprietário
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">

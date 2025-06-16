@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Owner } from '@/services/proprietarioService';
+import type { Proprietario } from '@/services/proprietarioService';
 import {
   Dialog,
   DialogContent,
@@ -20,20 +20,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  type: z.enum(['PF', 'PJ'], {
-    required_error: 'Selecione o tipo de pessoa',
-  }),
   cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
@@ -44,7 +34,7 @@ type FormData = z.infer<typeof formSchema>;
 interface EditOwnerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  owner: Owner | null;  // Alterei para poder tratar null
+  owner: Proprietario | null;  // Alterei para poder tratar null
   onUpdate: (data: FormData) => void;
 }
 
@@ -62,7 +52,6 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       nome: owner.nome,
-      type: owner.type,
       cpfCnpj: owner.cpfCnpj,
       email: owner.email,
       telefone: owner.telefone,
@@ -83,37 +72,14 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
           <DialogDescription>
             Altere os dados do proprietário conforme necessário.
           </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="PF">Pessoa Física</SelectItem>
-                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+        </DialogHeader>        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 proprietario-form">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 form-grid">
               <FormField
                 control={form.control}
                 name="nome"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Nome Completo</FormLabel>
                     <FormControl>
                       <Input placeholder="Nome do proprietário" {...field} />

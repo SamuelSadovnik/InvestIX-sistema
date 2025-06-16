@@ -3,6 +3,7 @@ import {
   Users, 
   Plus, 
   Search,
+  Building,
   UserCheck,
   Mail,
   Phone,
@@ -39,15 +40,18 @@ import AddOwnerForm from '@/components/proprietarios/AddOwnerForm';
 import { EditOwnerDialog } from '@/components/proprietarios/EditOwnerDialog';
 import { OwnerDetailsDialog } from '@/components/proprietarios/OwnerDetailsDialog';
 import { DeleteOwnerDialog } from '@/components/proprietarios/DeleteOwnerDialog';
-import { atualizarProprietario, listarProprietarios, Proprietario } from '@/hooks/useProprietarios';
+import { atualizarProprietario, listarProprietarios, Proprietario } from '@/services/proprietarioService';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Proprietarios() {
+  const { userType } = useAuth();
   const [owners, setOwners] = useState<Proprietario[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [ownerType, setOwnerType] = useState<string | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [properties, setProperties] = useState<PropertyType[]>([]);
   const [editDialog, setEditDialog] = useState<{ isOpen: boolean; owner: any }>({
     isOpen: false,
     owner: null,
@@ -124,7 +128,7 @@ export default function Proprietarios() {
     setDetailsDialog({ isOpen: true, owner });
   };
 
-  const handleDeleteClick = (ownerId: number, ownerName: string) => {
+  const handleDeleteClick = (ownerId: string, ownerName: string) => {
     setDeleteDialog({ isOpen: true, ownerId, ownerName });
   };
 
@@ -141,10 +145,11 @@ export default function Proprietarios() {
   }
 };
 
-  const handleAfterDelete = () => {
-    toast.success('Proprietário excluído com sucesso!');
-    setDeleteDialog({ isOpen: false, ownerId: null, ownerName: '' });
-    carregarProprietarios();
+
+  const handleAfterDelete = async () => {
+  toast.success('Proprietário excluído com sucesso!');
+  setDeleteDialog({ isOpen: false, ownerId: null, ownerName: '' });
+  const data = await carregarProprietarios();
   };
 
   return (
@@ -154,23 +159,29 @@ export default function Proprietarios() {
           <h1 className="text-2xl md:text-3xl font-bold">Proprietários</h1>
           <p className="text-muted-foreground">Gerencie os proprietários de imóveis</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="invistaix-gradient">
-              <Plus className="h-4 w-4 mr-2" />
-              Cadastrar Proprietário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Cadastrar Novo Proprietário</DialogTitle>
-              <DialogDescription>
-                Preencha os dados do proprietário.
-              </DialogDescription>
-            </DialogHeader>
-            <AddOwnerForm onSuccess={handleFormSuccess} />
-          </DialogContent>
-        </Dialog>
+        {userType === 'admin' && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="invistaix-gradient">
+                <Plus className="h-4 w-4 mr-2" />
+                Cadastrar Proprietário
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[800px] lg:max-w-[900px] max-w-[95vw] max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col p-0">
+              <div className="px-6 py-4 border-b">
+                <DialogHeader>
+                  <DialogTitle className="text-xl sm:text-2xl">Cadastrar Novo Proprietário</DialogTitle>
+                  <DialogDescription className="text-sm sm:text-base">
+                    Preencha os dados do proprietário e associe os imóveis que pertencem a ele.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+              <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar-form">
+                <AddOwnerForm onSuccess={handleFormSuccess} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
@@ -200,18 +211,25 @@ export default function Proprietarios() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredOwners.length > 0 ? (
           filteredOwners.map((owner) => {
+            const ownerProperties = properties.filter(p => p.owner === owner.id);
             const type = getOwnerType(owner.cpfCnpj);
             return (
               <Card key={owner.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">{owner.nome}</CardTitle>
-                    <span className={type === 'PF'
-                      ? 'inline-flex items-center rounded-md bg-invistaix-100 px-2 py-1 text-xs font-medium text-invistaix-400 ring-1 ring-inset ring-invistaix-400/10'
-                      : 'inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10'}>
+                    <Badge 
+                      className={type === 'PF' ? 'bg-invistaix-100 text-invistaix-400 hover:bg-invistaix-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}
+                    >
                       {type === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}
-                    </span>
+                    </Badge>
                   </div>
+                  <CardDescription className="flex items-center mt-1">
+                    <Building className="h-3 w-3 mr-1" />
+                    {ownerProperties.length > 0 
+                      ? `${ownerProperties.length} imóvel(is)` 
+                      : 'Nenhum imóvel cadastrado'}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -266,9 +284,8 @@ export default function Proprietarios() {
               Tente ajustar seus filtros ou cadastre um novo proprietário.
             </p>
           </div>
-        )}
-      </div>
-
+        )}      </div>
+      
       {editDialog.owner && (
         <EditOwnerDialog
           isOpen={editDialog.isOpen}
