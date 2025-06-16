@@ -23,37 +23,37 @@ const Sidebar = () => {
       title: "Dashboard", 
       path: "/dashboard", 
       icon: <LayoutDashboard className="h-5 w-5" />,
-      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     },
     { 
       title: "Imóveis", 
       path: "/dashboard/imoveis", 
       icon: <Home className="h-5 w-5" />,
-      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     },
     { 
       title: "Proprietários", 
       path: "/dashboard/proprietarios", 
       icon: <Users className="h-5 w-5" />,
-      allowedUsers: ['ADMIN', 'GESTOR']
+      allowedUsers: ['admin', 'gestor']
     },
     { 
       title: "Gestores", 
       path: "/dashboard/gestores", 
       icon: <UserPlus className="h-5 w-5" />,
-      allowedUsers: ['ADMIN']
+      allowedUsers: ['admin']
     },
     { 
       title: "Financeiro", 
       path: "/dashboard/financeiro", 
       icon: <DollarSign className="h-5 w-5" />,
-      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     },
     { 
       title: "Performance", 
       path: "/dashboard/performance", 
       icon: <BarChart3 className="h-5 w-5" />,
-      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
+      allowedUsers: ['admin', 'gestor', 'proprietario']
     }
   ];
 
