@@ -36,9 +36,11 @@ import {
   DialogTrigger 
 } from '@/components/ui/dialog';
 import { listarProprietarios, Proprietario } from '@/services/proprietarioService';
-import AddOwnerForm from '@/components/AddOwnerForm';
+import AddOwnerForm from '@/components/proprietarios/AddOwnerForm';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Owners = () => {
+  const { userType } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [ownerType, setOwnerType] = useState<string | undefined>(undefined);
   const [owners, setOwners] = useState<Proprietario[]>([]);
@@ -121,23 +123,25 @@ const Owners = () => {
           <h1 className="text-2xl md:text-3xl font-bold">Proprietários</h1>
           <p className="text-muted-foreground">Gerencie os proprietários de imóveis</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="invistaix-gradient">
-              <Plus className="h-4 w-4 mr-2" />
-              Cadastrar Proprietário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Cadastrar Novo Proprietário</DialogTitle>
-              <DialogDescription>
-                Preencha os dados do proprietário para adicioná-lo ao sistema.
-              </DialogDescription>
-            </DialogHeader>
-            <AddOwnerForm onSuccess={handleOwnerCreated} />
-          </DialogContent>
-        </Dialog>
+        {userType === 'admin' && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="invistaix-gradient">
+                <Plus className="h-4 w-4 mr-2" />
+                Cadastrar Proprietário
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Cadastrar Novo Proprietário</DialogTitle>
+                <DialogDescription>
+                  Preencha os dados do proprietário para adicioná-lo ao sistema.
+                </DialogDescription>
+              </DialogHeader>
+              <AddOwnerForm onSuccess={handleOwnerCreated} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">

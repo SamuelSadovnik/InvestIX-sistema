@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { managers as initialManagers } from '@/data/mockData';
 
@@ -7,7 +6,6 @@ export interface Manager {
   name: string;
   email: string;
   phone: string;
-  role: string;
   properties: string[];
   isOwner?: boolean;
 }

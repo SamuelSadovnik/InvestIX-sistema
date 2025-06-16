@@ -42,8 +42,10 @@ import { OwnerDetailsDialog } from '@/components/proprietarios/OwnerDetailsDialo
 import { DeleteOwnerDialog } from '@/components/proprietarios/DeleteOwnerDialog';
 import { atualizarProprietario, listarProprietarios, Proprietario } from '@/services/proprietarioService';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Proprietarios() {
+  const { userType } = useAuth();
   const [owners, setOwners] = useState<Proprietario[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -156,27 +158,30 @@ export default function Proprietarios() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Proprietários</h1>
           <p className="text-muted-foreground">Gerencie os proprietários de imóveis</p>
-        </div>        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="invistaix-gradient">
-              <Plus className="h-4 w-4 mr-2" />
-              Cadastrar Proprietário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px] lg:max-w-[900px] max-w-[95vw] max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col p-0">
-            <div className="px-6 py-4 border-b">
-              <DialogHeader>
-                <DialogTitle className="text-xl sm:text-2xl">Cadastrar Novo Proprietário</DialogTitle>
-                <DialogDescription className="text-sm sm:text-base">
-                  Preencha os dados do proprietário e associe os imóveis que pertencem a ele.
-                </DialogDescription>
-              </DialogHeader>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar-form">
-              <AddOwnerForm onSuccess={handleFormSuccess} />
-            </div>
-          </DialogContent>
-        </Dialog>
+        </div>
+        {userType === 'admin' && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="invistaix-gradient">
+                <Plus className="h-4 w-4 mr-2" />
+                Cadastrar Proprietário
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[800px] lg:max-w-[900px] max-w-[95vw] max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col p-0">
+              <div className="px-6 py-4 border-b">
+                <DialogHeader>
+                  <DialogTitle className="text-xl sm:text-2xl">Cadastrar Novo Proprietário</DialogTitle>
+                  <DialogDescription className="text-sm sm:text-base">
+                    Preencha os dados do proprietário e associe os imóveis que pertencem a ele.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+              <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar-form">
+                <AddOwnerForm onSuccess={handleFormSuccess} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">

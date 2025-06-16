@@ -14,13 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -28,9 +21,6 @@ import { properties } from '@/data/mockData';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  type: z.enum(['PF', 'PJ'], {
-    required_error: 'Selecione o tipo de pessoa',
-  }),
   cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
@@ -53,7 +43,6 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-
       nome: '',
       cpfCnpj: '',
       email: '',
@@ -63,14 +52,10 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
       properties: [],
     },
   });
-
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      await criarProprietario({
-        ...data
-      });
-      toast.success('Proprietário cadastrado com sucesso!');  
+      await criarProprietario(values);
       form.reset();
       toast.success('Proprietário cadastrado com sucesso!');
       onSuccess();
@@ -93,30 +78,9 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
               <FormField
                 control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem className="form-field-container">
-                    <FormLabel className="text-sm">Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="text-sm">
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="PF">Pessoa Física</SelectItem>
-                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="nome"
                 render={({ field }) => (
-                  <FormItem className="form-field-container">
+                  <FormItem className="form-field-container sm:col-span-2">
                     <FormLabel className="text-sm">Nome completo</FormLabel>
                     <FormControl>
                       <Input placeholder="Nome do proprietário" {...field} className="text-sm" />
