@@ -4,6 +4,7 @@ import com.invistaix.sistema.util.JwtAuthenticationFilter;
 import com.invistaix.sistema.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,6 +40,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Adiciona CORS
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/proprietarios/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/proprietarios", "/api/proprietarios/").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)

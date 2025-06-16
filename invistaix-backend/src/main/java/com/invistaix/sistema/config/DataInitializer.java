@@ -13,24 +13,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
-    
+
     @Autowired
     private AdminRepository adminRepository;
-    
+
     @Autowired
     private GestorRepository gestorRepository;
-    
+
     @Autowired
     private ProprietarioRepository proprietarioRepository;
-    
+
     @Autowired
     private PasswordEncoderUtil passwordEncoderUtil;
-    
+
     @Override
     public void run(String... args) throws Exception {
         initializeDefaultUsers();
     }
-    
+
     private void initializeDefaultUsers() {
         // Criar admin padrão se não existir
         if (!adminRepository.existsByEmail("admin@sistema.com")) {
@@ -41,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
             adminRepository.save(admin);
             System.out.println("✅ Admin criado: admin@sistema.com / 123");
         }
-        
+
         // Criar gestor de teste se não existir
         if (!gestorRepository.existsByEmail("gestor@sistema.com")) {
             Gestor gestor = new Gestor();
@@ -52,7 +52,7 @@ public class DataInitializer implements CommandLineRunner {
             gestorRepository.save(gestor);
             System.out.println("✅ Gestor criado: gestor@sistema.com / 123");
         }
-        
+
         // Criar proprietário de teste se não existir
         if (!proprietarioRepository.existsByEmail("proprietario@sistema.com")) {
             Proprietario proprietario = new Proprietario();
@@ -64,7 +64,7 @@ public class DataInitializer implements CommandLineRunner {
             proprietarioRepository.save(proprietario);
             System.out.println("✅ Proprietário criado: proprietario@sistema.com / 123");
         }
-        
+
         System.out.println("🔐 Inicialização de usuários concluída!");
     }
 }

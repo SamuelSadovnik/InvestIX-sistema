@@ -18,6 +18,9 @@ public class ProprietarioController {
     // Criar um novo proprietário
     @PostMapping
     public ResponseEntity<Proprietario> createProprietario(@RequestBody Proprietario proprietario) {
+        if (proprietario.getSenha() == null || proprietario.getSenha().isEmpty()) {
+            throw new IllegalArgumentException("Senha é obrigatória");
+        }
         Proprietario savedProprietario = proprietarioService.save(proprietario);
         return ResponseEntity.ok(savedProprietario);
     }

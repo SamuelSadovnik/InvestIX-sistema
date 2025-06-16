@@ -1,7 +1,9 @@
 package com.invistaix.sistema.util;
 
+import com.invistaix.sistema.enums.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -41,15 +43,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     
                     // Verifica se já não está autenticado
                     if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                        User principal = new User(email, "", List.of()); // sem roles no momento
+                        UserType userType = jwtUtil.getUserTypeFromToken(token);
+                        String role = "ROLE_" + userType.name();
+                        logger.info("Authenticating user: " + email + " with role: " + role);
+                        
+                        User principal = new User(email, "", List.of(new SimpleGrantedAuthority(role)));
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
+                } else {
+                    logger.warn("Invalid JWT token: " + token);
                 }
             } catch (Exception e) {
                 logger.error("Erro ao processar token JWT: " + e.getMessage());
+                logger.error("Stack trace: ", e);
             }
         }
 
