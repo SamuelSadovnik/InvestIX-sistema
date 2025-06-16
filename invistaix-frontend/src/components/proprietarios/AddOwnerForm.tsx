@@ -67,9 +67,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      await criarProprietario({
-        ...data
-      });
+      await criarProprietario(values);
       toast.success('Proprietário cadastrado com sucesso!');  
       form.reset();
       toast.success('Proprietário cadastrado com sucesso!');

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -17,30 +16,25 @@ import {
   MapPin
 } from 'lucide-react';
 import { properties } from '@/data/mockData';
-
-interface Manager {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  properties: string[];
-  isOwner?: boolean;
-}
+import { Gestor } from '@/services/gestorService';
 
 interface ManagerDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  manager: Manager;
+  manager: Gestor;
+  managedPropertiesIds: string[]; // ids dos imóveis que o gestor gerencia
+  isOwner?: boolean;
 }
 
 export const ManagerDetailsDialog: React.FC<ManagerDetailsDialogProps> = ({
   isOpen,
   onClose,
   manager,
+  managedPropertiesIds,
+  isOwner,
 }) => {
-  const managerProperties = properties.filter(p => 
-    manager.properties.includes(p.id)
+  const managerProperties = properties.filter(p =>
+    (managedPropertiesIds ?? []).includes(p.id)
   );
 
   return (
@@ -48,8 +42,8 @@ export const ManagerDetailsDialog: React.FC<ManagerDetailsDialogProps> = ({
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            {manager.name}
-            {manager.isOwner && (
+            {manager.nome}
+            {isOwner && (
               <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
                 Também Proprietário
               </Badge>
@@ -68,8 +62,8 @@ export const ManagerDetailsDialog: React.FC<ManagerDetailsDialogProps> = ({
             <CardContent className="space-y-3">
               <div className="flex items-center text-sm">
                 <User className="h-4 w-4 mr-3 text-muted-foreground" />
-                <span className="font-medium mr-2">Função:</span>
-                <span>{manager.role}</span>
+                <span className="font-medium mr-2">CPF:</span>
+                <span>{manager.cpf}</span>
               </div>
               <div className="flex items-center text-sm">
                 <Mail className="h-4 w-4 mr-3 text-muted-foreground" />
@@ -79,7 +73,7 @@ export const ManagerDetailsDialog: React.FC<ManagerDetailsDialogProps> = ({
               <div className="flex items-center text-sm">
                 <Phone className="h-4 w-4 mr-3 text-muted-foreground" />
                 <span className="font-medium mr-2">Telefone:</span>
-                <span>{manager.phone}</span>
+                <span>{manager.telefone}</span>
               </div>
             </CardContent>
           </Card>

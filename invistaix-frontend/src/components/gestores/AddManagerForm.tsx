@@ -23,20 +23,17 @@ import {
 import { toast } from 'sonner';
 
 const formSchema = z.object({
-  name: z.string().min(2, {
+  nome: z.string().min(2, {
     message: "Nome deve ter pelo menos 2 caracteres.",
   }),
   email: z.string().email({
     message: "Por favor, insira um email válido.",
   }),
-  phone: z.string().min(10, {
+  cpf: z.string().min(11, {
+    message: "CPF deve ter pelo menos 11 caracteres.",
+  }),
+  telefone: z.string().min(10, {
     message: "Telefone deve ter pelo menos 10 caracteres.",
-  }),
-  username: z.string().min(3, {
-    message: "Usuário deve ter pelo menos 3 caracteres.",
-  }),
-  password: z.string().min(6, {
-    message: "Senha deve ter pelo menos 6 caracteres.",
   }),
 });
 
@@ -50,15 +47,15 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      nome: "",
       email: "",
-      phone: "",
-      username: "",
-      password: "",
+      telefone: "",
+      cpf: "",
     },
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log('Dados enviados para a API:', values);
     setIsSubmitting(true);
     try {
       onSubmit(values);
@@ -84,7 +81,7 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-60 sm:max-h-72 overflow-y-auto custom-scrollbar-form">
               <FormField
                 control={form.control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem className="form-field-container">
                     <FormLabel className="text-sm">Nome completo</FormLabel>
@@ -110,7 +107,7 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
               />
               <FormField
                 control={form.control}
-                name="phone"
+                name="telefone"
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2 form-field-container">
                     <FormLabel className="text-sm">Telefone</FormLabel>
@@ -121,45 +118,15 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
                   </FormItem>
                 )}
               />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="text-lg sm:text-xl">Acesso à Plataforma</CardTitle>
-            <CardDescription className="text-sm">Defina as credenciais de acesso</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 card-content-form">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar-form">
               <FormField
                 control={form.control}
-                name="username"
+                name="cpf"
                 render={({ field }) => (
                   <FormItem className="form-field-container">
-                    <FormLabel className="text-sm">Usuário</FormLabel>
+                    <FormLabel className="text-sm">CPF/CNPJ</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome de usuário para login" {...field} className="text-sm" />
+                      <Input placeholder="000.000.000-00" {...field} className="text-sm" />
                     </FormControl>
-                    <FormDescription className="text-xs">
-                      Nome que será usado para acessar o sistema
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="form-field-container">
-                    <FormLabel className="text-sm">Senha</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Digite uma senha segura" {...field} className="text-sm" />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      Senha com pelo menos 6 caracteres
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

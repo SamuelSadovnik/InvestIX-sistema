@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,30 +20,21 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { Gestor } from '@/services/gestorService';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
-  phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
-  role: z.string().min(2, 'Função deve ter pelo menos 2 caracteres'),
+  telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  cpf: z.string().min(11, 'CPF deve ter pelo menos 11 dígitos'),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-interface Manager {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  properties: string[];
-  isOwner?: boolean;
-}
-
 interface EditManagerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  manager: Manager;
+  manager: Gestor;
   onUpdate: (data: FormData) => void;
 }
 
@@ -57,10 +47,10 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: manager.name,
+      nome: manager.nome,
       email: manager.email,
-      phone: manager.phone,
-      role: manager.role,
+      telefone: manager.telefone,
+      cpf: manager.cpf,
     },
   });
 
@@ -84,7 +74,7 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome Completo</FormLabel>
@@ -98,12 +88,12 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="role"
+                name="cpf"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Função</FormLabel>
+                    <FormLabel>CPF</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Gerente de Locação" {...field} />
+                      <Input placeholder="000.000.000-00" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -126,7 +116,7 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="telefone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
@@ -143,9 +133,7 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit">
-                Salvar Alterações
-              </Button>
+              <Button type="submit">Salvar Alterações</Button>
             </div>
           </form>
         </Form>

@@ -17,7 +17,10 @@ public class Gestor {
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name = "CPF", nullable = true, length = 11, unique = true)
+    @Column(name = "telefone", nullable = true, length = 100, unique = true)
+    private String telefone;
+
+    @Column(name = "cpf", nullable = false, length = 11, unique = true)
     private String cpf;
 
     @Column(name = "senha", nullable = true, length = 64)
@@ -27,10 +30,11 @@ public class Gestor {
     public Gestor() {
     }
 
-    public Gestor(Integer id, String nome, String email, String cpf, String senha) {
+    public Gestor(Integer id, String nome, String email, String telefone, String cpf, String senha) {
         this.id = id;
         this.nome = nome;
         this.email = email;
+        this.telefone = telefone;
         this.cpf = cpf;
         this.senha = senha;
     }
@@ -58,6 +62,14 @@ public class Gestor {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 
     public String getCpf() {

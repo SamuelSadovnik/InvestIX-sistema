@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080/api/gestores';
+const API_URL = 'http://localhost:8080/api';
 
 export interface Gestor {
   id: number;
@@ -16,46 +16,74 @@ function getAuthHeaders() {
   };
 }
 
-export async function listarGestores() {
-  const response = await fetch(API_URL, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
+export const listarGestores = async (): Promise<Gestor[]> => {
+  try {
+    const response = await fetch(`${API_URL}/gestores`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
 
-  if (!response.ok) throw new Error('Erro ao buscar gestores');
-  // const data = await response.json();
-  // console.log('Dados recebidos da API:', data); // 👈 Adicione isso
-  // return data;
-  return await response.json();
-}
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
 
-export async function criarGestor(data: any) {
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  });
+    return await response.json();
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
 
-  if (!response.ok) throw new Error('Erro ao criar gestor');
-  return await response.json();
-}
+export const criarGestor = async (gestorData): Promise<Gestor> => {
+  try {
+    const response = await fetch(`${API_URL}/gestores`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(gestorData),
+    });
 
-export async function atualizarGestor(id: string, data: any) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  });
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
 
-  if (!response.ok) throw new Error('Erro ao atualizar gestor');
-  return await response.json();
-}
+    return await response.json();
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
 
-export async function removerGestor(id: string) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
+export const deletarGestor = async (id: number): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}/gestores/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
 
-  if (!response.ok) throw new Error('Erro ao remover gestor');
-}
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
+
+export const atualizarGestor = async (id: number, dadosAtualizados: any): Promise<Gestor> => {
+  try {
+    const response = await fetch(`${API_URL}/gestores/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(dadosAtualizados),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};

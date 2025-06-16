@@ -31,12 +31,12 @@ import { AddManagerForm } from '@/components/gestores/AddManagerForm';
 import { EditManagerDialog } from '@/components/gestores/EditManagerDialog';
 import { ManagerDetailsDialog } from '@/components/gestores/ManagerDetailsDialog';
 import { DeleteManagerDialog } from '@/components/gestores/DeleteManagerDialog';
-import { listarGestores, criarGestor, atualizarGestor, removerGestor } from '@/services/gestorService';
+import { Gestor, listarGestores, criarGestor, atualizarGestor, deletarGestor } from '@/services/gestorService';
 import { toast } from 'sonner';
 
 export default function Gestores() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [managers, setManagers] = useState<any[]>([]);
+  const [managers, setManagers] = useState<Gestor[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editDialog, setEditDialog] = useState<{ isOpen: boolean; manager: any }>({
     isOpen: false,
@@ -52,20 +52,20 @@ export default function Gestores() {
     managerName: '',
   });
 
-  // useEffect(() => {
-  //   async function carregarGestores() {
-  //     try {
-  //       const data = await listarGestores();
-  //       setManagers(data);
-  //     } catch (error) {
-  //       console.error('Erro ao listar gestores:', error);
-  //     }
-  //   }
+  useEffect(() => {
+    async function carregarGestores() {
+      try {
+        const data = await listarGestores();
+        setManagers(data);
+      } catch (error) {
+        console.error('Erro ao listar gestores:', error);
+      }
+    }
 
-  //   carregarGestores();
-  // }, []);
+    carregarGestores();
+  }, []);
 
-  const addManager = async (data: any) => {
+  const addManager = async (data: Gestor) => {
     try {
       const novo = await criarGestor(data);
       setManagers(prev => [...prev, novo]);
@@ -74,7 +74,7 @@ export default function Gestores() {
     }
   };
 
-  const updateManager = async (id: string, data: any) => {
+  const updateManager = async (id: string, data: Gestor) => {
     try {
       const atualizado = await atualizarGestor(id, data);
       setManagers(prev => prev.map(g => g.id === id ? atualizado : g));
@@ -86,7 +86,7 @@ export default function Gestores() {
 
   const deleteManager = async (id: string) => {
     try {
-      await removerGestor(id);
+      await deletarGestor(id);
       setManagers(prev => prev.filter(g => g.id !== id));
     } catch (error) {
       console.error('Erro ao remover gestor:', error);
@@ -95,7 +95,7 @@ export default function Gestores() {
 
   const filteredManagers = managers.filter(manager => {
     const matchesSearch = manager.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          manager.email.toLowerCase().includes(searchTerm.toLowerCase());
+                           manager.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -185,8 +185,8 @@ export default function Gestores() {
           <TableBody>
             {filteredManagers.length > 0 ? (
               filteredManagers.map((manager) => {
-                const managerProperties = properties.filter(p => 
-                  manager.properties.includes(p.id)
+                const managerProperties = properties.filter(p =>
+                  Array.isArray(manager.properties) && manager.properties.includes(p.id)
                 );
                 return (
                   <TableRow key={manager.id}>
