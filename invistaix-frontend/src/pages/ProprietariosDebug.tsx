@@ -1,5 +1,5 @@
 import React from 'react';
-import { useOwners } from '@/hooks/useOwners';
+import { useOwners } from '@/hooks/useProprietarios';
 
 export default function ProprietariosDebug() {
   const { owners } = useOwners();

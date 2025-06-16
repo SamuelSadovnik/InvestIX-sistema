@@ -47,9 +47,16 @@ public class AuthService {
             throw new BadCredentialsException("Usuário ou senha inválidos");
         }
 
-        // Verificar senha
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getSenha())) {
-            throw new BadCredentialsException("Usuário ou senha inválidos");
+        // Verificar senha apenas para gestores e admins
+        if (user.getUserType() == UserType.GESTOR || user.getUserType() == UserType.ADMIN) {
+            if (!passwordEncoder.matches(loginRequest.getPassword(), getPasswordForUser(user))) {
+                throw new BadCredentialsException("Usuário ou senha inválidos");
+            }
+        } else {
+            // Proprietários não têm senha, apenas verificar se o email existe
+            if (proprietarioRepository.findByEmail(loginRequest.getEmail()).isEmpty()) {
+                throw new BadCredentialsException("Usuário não encontrado");
+            }
         }
 
         // Gerar token JWT
@@ -58,6 +65,19 @@ public class AuthService {
         // Criar resposta
         UserDto userDto = new UserDto(user);
         return new LoginResponse(token, userDto);
+    }
+
+    private String getPasswordForUser(AuthenticatedUser user) {
+        switch (user.getUserType()) {
+            case GESTOR:
+                return gestorRepository.findById(user.getId())
+                        .orElseThrow().getSenha();
+            case ADMIN:
+                return adminRepository.findById(user.getId())
+                        .orElseThrow().getSenha();
+            default:
+                return null;
+        }
     }
 
     public AuthenticatedUser findUserByEmail(String email) {
@@ -90,8 +110,12 @@ public class AuthService {
         }
     }
 
-    // Método para atualizar senha (opcional)
+    // Método para atualizar senha (apenas para gestores e admins)
     public void updatePassword(String email, String newPassword, UserType userType) {
+        if (userType == UserType.PROPRIETARIO) {
+            throw new UnsupportedOperationException("Proprietários não podem atualizar senhas");
+        }
+        
         String encodedPassword = passwordEncoder.encode(newPassword);
         
         switch (userType) {
@@ -100,12 +124,6 @@ public class AuthService {
                     .orElseThrow(() -> new UsernameNotFoundException("Gestor não encontrado"));
                 gestor.setSenha(encodedPassword);
                 gestorRepository.save(gestor);
-                break;
-            case PROPRIETARIO:
-                Proprietario proprietario = proprietarioRepository.findByEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("Proprietário não encontrado"));
-                proprietario.setSenha(encodedPassword);
-                proprietarioRepository.save(proprietario);
                 break;
             case ADMIN:
                 Admin admin = adminRepository.findByEmail(email)

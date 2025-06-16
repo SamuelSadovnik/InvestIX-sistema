@@ -2,6 +2,7 @@ package com.invistaix.sistema.service;
 
 import com.invistaix.sistema.model.Gestor;
 import com.invistaix.sistema.repository.GestorRepository;
+import com.invistaix.sistema.repository.ImovelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ public class GestorService {
 
     @Autowired
     private GestorRepository gestorRepository;
+    
+    @Autowired
+    private ImovelRepository imovelRepository;
 
     // Criar ou atualizar um gestor
     public Gestor save(Gestor gestor) {
@@ -28,9 +32,14 @@ public class GestorService {
         return gestorRepository.save(gestor);
     }
 
-    // Listar todos os gestores
+    // Listar todos os gestores com contagem de imóveis
     public List<Gestor> findAll() {
-        return gestorRepository.findAll();
+        List<Gestor> gestores = gestorRepository.findAll();
+        for (Gestor gestor : gestores) {
+            int propertyCount = imovelRepository.countByGestorId(gestor.getId());
+            gestor.setPropertyCount(propertyCount);
+        }
+        return gestores;
     }
 
     // Buscar um gestor por ID
@@ -49,6 +58,7 @@ public class GestorService {
         // Atualiza os campos do gestor existente
         existingGestor.setNome(gestor.getNome());
         existingGestor.setEmail(gestor.getEmail());
+        existingGestor.setTelefone(gestor.getTelefone());
         existingGestor.setCpf(gestor.getCpf());
         existingGestor.setSenha(gestor.getSenha());
         // Salva o gestor atualizado (a validação de unicidade é feita no save)
