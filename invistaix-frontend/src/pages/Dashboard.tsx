@@ -32,8 +32,7 @@ import {
   performanceData, 
   incomeData, 
   expenseData, 
-  resultData,
-  inccData
+  resultData
 } from '@/data/mockData';
 
 const Dashboard = () => {
@@ -123,41 +122,7 @@ const Dashboard = () => {
         />
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="lg:col-span-2 animate-fade-in">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
-              Índice INCC
-            </CardTitle>
-            <CardDescription>Índice Nacional de Custo da Construção</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              {inccData.map((item, index) => (
-                <div 
-                  key={index} 
-                  className={`p-4 rounded-lg border transition-all duration-200 ${
-                    index === inccData.length - 1 
-                      ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-300 shadow-sm'
-                      : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 hover:shadow-sm'
-                  }`}
-                >
-                  <p className="text-sm font-medium text-gray-700">{item.month}</p>
-                  <p className={`text-lg font-bold ${
-                    item.value > 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {item.value > 0 ? '+' : ''}{item.value}%
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-lg">
-              📊 Fonte: FGV • Última atualização: 15 de Abril de 2025
-            </div>
-          </CardContent>
-        </Card>
-        
+      <div className="grid gap-6">
         <Card className="animate-fade-in">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
