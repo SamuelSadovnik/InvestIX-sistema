@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   AlertDialog,
@@ -10,20 +9,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { deletarProprietario } from '@/hooks/useProprietarios';
 
 interface DeleteOwnerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  ownerId: number | null;
   ownerName: string;
+  onAfterDelete?: () => void;
 }
 
 export const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
   isOpen,
   onClose,
-  onConfirm,
+  ownerId,
   ownerName,
+  onAfterDelete,
 }) => {
+  const handleConfirm = async () => {
+    try {
+      await deletarProprietario(ownerId); 
+      if (onAfterDelete) onAfterDelete();
+      onClose();
+    } catch (error) {
+      console.error('Erro ao excluir proprietário:', error);
+    }
+  };
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
@@ -35,7 +47,10 @@ export const DeleteOwnerDialog: React.FC<DeleteOwnerDialogProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onClose}>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
             Excluir
           </AlertDialogAction>
         </AlertDialogFooter>

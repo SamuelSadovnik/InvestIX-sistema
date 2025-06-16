@@ -33,7 +33,7 @@ public class JwtUtil {
 
     public String generateToken(AuthenticatedUser user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userType", user.getUserType().getValue());
+        claims.put("userType", user.getUserType().name());
         claims.put("username", user.getNome());
         claims.put("userId", user.getId());
 
@@ -56,7 +56,7 @@ public class JwtUtil {
 
     public UserType getUserTypeFromToken(String token) {
         String userTypeStr = (String) getAllClaimsFromToken(token).get("userType");
-        return UserType.valueOf(userTypeStr.toUpperCase());
+        return UserType.valueOf(userTypeStr);
     }
 
     public Integer getUserIdFromToken(String token) {

@@ -7,14 +7,12 @@ public class AuthenticatedUser {
     private String nome;
     private String email;
     private UserType userType;
-    private String senha;
 
     // Construtores
     public AuthenticatedUser(Gestor gestor) {
         this.id = gestor.getId();
         this.nome = gestor.getNome();
         this.email = gestor.getEmail();
-        this.senha = gestor.getSenha();
         this.userType = UserType.GESTOR;
     }
 
@@ -22,7 +20,6 @@ public class AuthenticatedUser {
         this.id = proprietario.getId();
         this.nome = proprietario.getNome();
         this.email = proprietario.getEmail();
-        this.senha = proprietario.getSenha();
         this.userType = UserType.PROPRIETARIO;
     }
 
@@ -30,7 +27,6 @@ public class AuthenticatedUser {
         this.id = admin.getId();
         this.nome = admin.getNome();
         this.email = admin.getEmail();
-        this.senha = admin.getSenha();
         this.userType = UserType.ADMIN;
     }
 
@@ -61,12 +57,5 @@ public class AuthenticatedUser {
     }
     public void setUserType(UserType userType) {
         this.userType = userType;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 }

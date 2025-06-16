@@ -1,6 +1,9 @@
 package com.invistaix.sistema.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "GESTORES")
@@ -17,20 +20,28 @@ public class Gestor {
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
+    @Column(name = "telefone", length = 20)
+    private String telefone;
+
+    @Transient
+    @JsonProperty("propertyCount")
+    private int propertyCount;
+
     @Column(name = "CPF", nullable = false, length = 11, unique = true)
     private String cpf;
 
-    @Column(name = "senha", nullable = false, length = 64)
+    @Column(name = "senha", nullable = false, length = 60)
     private String senha;
 
     // Construtores
     public Gestor() {
     }
 
-    public Gestor(Integer id, String nome, String email, String cpf, String senha) {
+    public Gestor(Integer id, String nome, String email, String telefone, String cpf, String senha) {
         this.id = id;
         this.nome = nome;
         this.email = email;
+        this.telefone = telefone;
         this.cpf = cpf;
         this.senha = senha;
     }
@@ -60,6 +71,14 @@ public class Gestor {
         this.email = email;
     }
 
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
     public String getCpf() {
         return cpf;
     }
@@ -74,5 +93,13 @@ public class Gestor {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public int getPropertyCount() {
+        return propertyCount;
+    }
+
+    public void setPropertyCount(int propertyCount) {
+        this.propertyCount = propertyCount;
     }
 }

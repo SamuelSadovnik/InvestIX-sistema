@@ -23,4 +23,7 @@ public interface ImovelRepository extends JpaRepository<Imovel, Integer> {
 
     // Buscar imóveis com valor de aluguel atual dentro de um intervalo
     List<Imovel> findByValorAluguelAtualBetween(Double minValor, Double maxValor);
+    
+    // Contar imóveis por gestor
+    int countByGestorId(Integer gestorId);
 }

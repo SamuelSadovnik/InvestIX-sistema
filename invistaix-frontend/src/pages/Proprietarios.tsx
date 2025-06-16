@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Users, 
   Plus, 
   Search,
-  Building,
   UserCheck,
   Mail,
   Phone,
@@ -28,7 +27,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { properties } from '@/data/mockData';
 import { 
   Dialog, 
   DialogContent, 
@@ -41,10 +39,12 @@ import AddOwnerForm from '@/components/proprietarios/AddOwnerForm';
 import { EditOwnerDialog } from '@/components/proprietarios/EditOwnerDialog';
 import { OwnerDetailsDialog } from '@/components/proprietarios/OwnerDetailsDialog';
 import { DeleteOwnerDialog } from '@/components/proprietarios/DeleteOwnerDialog';
-import { useOwners } from '@/hooks/useOwners';
+import { atualizarProprietario, listarProprietarios, Proprietario } from '@/hooks/useProprietarios';
 import { toast } from 'sonner';
 
 export default function Proprietarios() {
+  const [owners, setOwners] = useState<Proprietario[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [ownerType, setOwnerType] = useState<string | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -56,25 +56,60 @@ export default function Proprietarios() {
     isOpen: false,
     owner: null,
   });
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; ownerId: string; ownerName: string }>({
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; ownerId: number | null; ownerName: string }>({
     isOpen: false,
-    ownerId: '',
+    ownerId: null,
     ownerName: '',
   });
-  
-  const { owners, addOwner, updateOwner, deleteOwner } = useOwners();
-  
+
+  const carregarProprietarios = async () => {
+      setIsLoading(true);
+      try {
+        const data = await listarProprietarios();
+        setOwners(data);
+      } catch (error) {
+        toast.error('Erro ao carregar proprietários');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      carregarProprietarios();
+    }, []);
+
+
+  // Função para inferir o tipo baseado no CPF/CNPJ
+  function getOwnerType(cpfCnpj: string | undefined): string | undefined {
+    if (!cpfCnpj) return undefined;
+    const digits = cpfCnpj.replace(/\D/g, '');
+    if (digits.length === 11) return 'PF';
+    if (digits.length === 14) return 'PJ';
+    return undefined;
+  }
+
+  const lowerSearchTerm = searchTerm.toLowerCase();
+
   const filteredOwners = owners.filter(owner => {
-    const matchesSearch = owner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          owner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          owner.document.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !ownerType || owner.type === ownerType;
-    
+    const nome = owner.nome?.toLowerCase() || "";
+    const email = owner.email?.toLowerCase() || "";
+    const cpfCnpj = owner.cpfCnpj?.toLowerCase() || "";
+
+    const matchesSearch =
+      nome.includes(lowerSearchTerm) ||
+      email.includes(lowerSearchTerm) ||
+      cpfCnpj.includes(lowerSearchTerm);
+
+    const type = getOwnerType(owner.cpfCnpj);
+    const matchesType = !ownerType || type === ownerType;
+
     return matchesSearch && matchesType;
   });
 
+
   const handleFormSuccess = () => {
     setIsDialogOpen(false);
+    carregarProprietarios();
   };
 
   const handleTypeChange = (value: string) => {
@@ -89,19 +124,27 @@ export default function Proprietarios() {
     setDetailsDialog({ isOpen: true, owner });
   };
 
-  const handleDeleteClick = (ownerId: string, ownerName: string) => {
+  const handleDeleteClick = (ownerId: number, ownerName: string) => {
     setDeleteDialog({ isOpen: true, ownerId, ownerName });
   };
 
-  const handleUpdateOwner = (data: any) => {
-    updateOwner(editDialog.owner.id, data);
-    setEditDialog({ isOpen: false, owner: null });
-  };
+  const handleUpdateOwner = async (data: any) => {
+  if (!editDialog.owner) return;
 
-  const handleDeleteConfirm = () => {
-    deleteOwner(deleteDialog.ownerId);
-    setDeleteDialog({ isOpen: false, ownerId: '', ownerName: '' });
+  try {
+    await atualizarProprietario(editDialog.owner.id, data);
+    toast.success('Proprietário atualizado com sucesso!');
+    setEditDialog({ isOpen: false, owner: null });
+    await carregarProprietarios();
+  } catch (error) {
+    toast.error('Erro ao atualizar proprietário');
+  }
+};
+
+  const handleAfterDelete = () => {
     toast.success('Proprietário excluído com sucesso!');
+    setDeleteDialog({ isOpen: false, ownerId: null, ownerName: '' });
+    carregarProprietarios();
   };
 
   return (
@@ -110,25 +153,22 @@ export default function Proprietarios() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Proprietários</h1>
           <p className="text-muted-foreground">Gerencie os proprietários de imóveis</p>
-        </div>        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="invistaix-gradient">
               <Plus className="h-4 w-4 mr-2" />
               Cadastrar Proprietário
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px] lg:max-w-[900px] max-w-[95vw] max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col p-0">
-            <div className="px-6 py-4 border-b">
-              <DialogHeader>
-                <DialogTitle className="text-xl sm:text-2xl">Cadastrar Novo Proprietário</DialogTitle>
-                <DialogDescription className="text-sm sm:text-base">
-                  Preencha os dados do proprietário e associe os imóveis que pertencem a ele.
-                </DialogDescription>
-              </DialogHeader>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar-form">
-              <AddOwnerForm onSuccess={handleFormSuccess} />
-            </div>
+          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Cadastrar Novo Proprietário</DialogTitle>
+              <DialogDescription>
+                Preencha os dados do proprietário.
+              </DialogDescription>
+            </DialogHeader>
+            <AddOwnerForm onSuccess={handleFormSuccess} />
           </DialogContent>
         </Dialog>
       </div>
@@ -160,28 +200,24 @@ export default function Proprietarios() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredOwners.length > 0 ? (
           filteredOwners.map((owner) => {
-            const ownerProperties = properties.filter(p => p.owner === owner.id);
+            const type = getOwnerType(owner.cpfCnpj);
             return (
               <Card key={owner.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{owner.name}</CardTitle>
-                    <Badge 
-                      className={owner.type === 'PF' ? 'bg-invistaix-100 text-invistaix-400 hover:bg-invistaix-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}
-                    >
-                      {owner.type === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}
-                    </Badge>
+                    <CardTitle className="text-lg">{owner.nome}</CardTitle>
+                    <span className={type === 'PF'
+                      ? 'inline-flex items-center rounded-md bg-invistaix-100 px-2 py-1 text-xs font-medium text-invistaix-400 ring-1 ring-inset ring-invistaix-400/10'
+                      : 'inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10'}>
+                      {type === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}
+                    </span>
                   </div>
-                  <CardDescription className="flex items-center mt-1">
-                    <Building className="h-3 w-3 mr-1" />
-                    {ownerProperties.length} imóvel(is)
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm">
                       <UserCheck className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">{owner.document}</span>
+                      <span className="text-muted-foreground">{owner.cpfCnpj}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -189,7 +225,7 @@ export default function Proprietarios() {
                     </div>
                     <div className="flex items-center text-sm">
                       <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">{owner.phone}</span>
+                      <span className="text-muted-foreground">{owner.telefone}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -213,7 +249,7 @@ export default function Proprietarios() {
                       variant="ghost" 
                       size="icon" 
                       className="text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteClick(owner.id, owner.name)}
+                      onClick={() => handleDeleteClick(owner.id, owner.nome)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -230,8 +266,9 @@ export default function Proprietarios() {
               Tente ajustar seus filtros ou cadastre um novo proprietário.
             </p>
           </div>
-        )}      </div>
-      
+        )}
+      </div>
+
       {editDialog.owner && (
         <EditOwnerDialog
           isOpen={editDialog.isOpen}
@@ -249,12 +286,18 @@ export default function Proprietarios() {
         />
       )}
 
-      <DeleteOwnerDialog
-        isOpen={deleteDialog.isOpen}
-        onClose={() => setDeleteDialog({ isOpen: false, ownerId: '', ownerName: '' })}
-        onConfirm={handleDeleteConfirm}
-        ownerName={deleteDialog.ownerName}
-      />
+      {deleteDialog.ownerId !== null && (
+        <DeleteOwnerDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() =>
+            setDeleteDialog({ isOpen: false, ownerId: null, ownerName: '' })
+          }
+          onConfirm={handleAfterDelete}
+          ownerId={deleteDialog.ownerId}
+          ownerName={deleteDialog.ownerName}
+          onAfterDelete={carregarProprietarios}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 package com.invistaix.sistema.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "PROPRIETARIOS")
@@ -23,8 +24,11 @@ public class Proprietario {
     @Column(name = "cpf_cnpj", nullable = false, length = 14, unique = true)
     private String cpfCnpj;
 
-    @Column(name = "senha", nullable = false, length = 64)
+    @Column(name = "senha", nullable = false, length = 60)
     private String senha;
+
+    @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Imovel> imoveis;
 
     // Construtores
     public Proprietario() {
@@ -86,5 +90,13 @@ public class Proprietario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public List<Imovel> getImoveis() {
+        return imoveis;
+    }
+
+    public void setImoveis(List<Imovel> imoveis) {
+        this.imoveis = imoveis;
     }
 }

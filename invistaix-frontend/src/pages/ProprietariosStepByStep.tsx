@@ -15,7 +15,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import AddOwnerForm from '@/components/proprietarios/AddOwnerForm';
-import { useOwners } from '@/hooks/useOwners';
+import { useOwners } from '@/hooks/useProprietarios';
 
 export default function ProprietariosStepByStep() {
   const [searchTerm, setSearchTerm] = useState('');

@@ -25,7 +25,7 @@ public class Imovel {
     private Endereco endereco;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proprietario_id")
+    @JoinColumn(name = "proprietario_id", nullable = false)
     private Proprietario proprietario;
 
     @ManyToOne(fetch = FetchType.LAZY)
