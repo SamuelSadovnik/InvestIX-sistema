@@ -96,7 +96,7 @@ public class ProprietarioService {
         findById(id);
         
         // Check if the owner has any properties
-        Long propertyCount = proprietarioRepository.countByProprietarioId(id);
+        Long propertyCount = proprietarioRepository.countByProprietarioId(id.longValue());
         if (propertyCount > 0) {
             throw new RuntimeException("Não é possível excluir o proprietário pois ele possui imóveis associados");
         }

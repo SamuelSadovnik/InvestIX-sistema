@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { LogIn, Building2, Lock, User } from 'lucide-react';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated, login } = useAuth();
@@ -22,23 +22,23 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simular delay de autenticação
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const success = login(username, password);
-    
-    if (success) {
-      toast.success('Login realizado com sucesso!');
-    } else {
-      toast.error('Credenciais inválidas');
+    try {
+      const result = await login(email, password);
+      
+      if (result.success) {
+        toast.success('Login realizado com sucesso!');
+      } else {
+        toast.error(result.error || 'Credenciais inválidas');
+      }
+    } catch (error) {
+      toast.error('Erro na conexão com o servidor');
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">
-      {/* Fundo com linhas diagonais mais organizadas */}
       <svg className="absolute inset-0 w-full h-full z-0" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <g stroke="#6ee7b7" strokeWidth="2" opacity="0.16">
           <line x1="0" y1="0" x2="100%" y2="100%" />
@@ -69,16 +69,16 @@ const Login = () => {
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-gray-700 font-semibold flex items-center gap-2">
+                <Label htmlFor="email" className="text-gray-700 font-semibold flex items-center gap-2">
                   <User className="h-4 w-4 text-green-600" />
-                  Usuário
+                  Email
                 </Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Digite seu usuário"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="Digite seu email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="h-12 border-2 border-gray-200 focus:border-green-500 focus:ring-green-200 transition-all duration-200 bg-white/90"
                 />

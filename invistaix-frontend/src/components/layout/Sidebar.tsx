@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn, normalizeUserType } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { 
@@ -17,49 +17,50 @@ import {
 const Sidebar = () => {
   const location = useLocation();
   const { logout, userType } = useAuth();
+  const normalizedUserType = normalizeUserType(userType);
   
   const allMenuItems = [
-    { 
-      title: "Dashboard", 
-      path: "/dashboard", 
+    {
+      title: "Dashboard",
+      path: "/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
       allowedUsers: ['admin', 'gestor', 'proprietario']
     },
-    { 
-      title: "Imóveis", 
-      path: "/dashboard/imoveis", 
+    {
+      title: "Imóveis",
+      path: "/dashboard/imoveis",
       icon: <Home className="h-5 w-5" />,
       allowedUsers: ['admin', 'gestor', 'proprietario']
     },
-    { 
-      title: "Proprietários", 
-      path: "/dashboard/proprietarios", 
+    {
+      title: "Proprietários",
+      path: "/dashboard/proprietarios",
       icon: <Users className="h-5 w-5" />,
       allowedUsers: ['admin', 'gestor']
     },
-    { 
-      title: "Gestores", 
-      path: "/dashboard/gestores", 
+    {
+      title: "Gestores",
+      path: "/dashboard/gestores",
       icon: <UserPlus className="h-5 w-5" />,
       allowedUsers: ['admin']
     },
-    { 
-      title: "Financeiro", 
-      path: "/dashboard/financeiro", 
+    {
+      title: "Financeiro",
+      path: "/dashboard/financeiro",
       icon: <DollarSign className="h-5 w-5" />,
       allowedUsers: ['admin', 'gestor', 'proprietario']
     },
-    { 
-      title: "Performance", 
-      path: "/dashboard/performance", 
+    {
+      title: "Performance",
+      path: "/dashboard/performance",
       icon: <BarChart3 className="h-5 w-5" />,
       allowedUsers: ['admin', 'gestor', 'proprietario']
     }
   ];
 
   // Filtrar itens de menu baseado no tipo de usuário
-  const menuItems = allMenuItems.filter(item => 
-    item.allowedUsers.includes(userType || '')
+  const menuItems = allMenuItems.filter(item =>
+    item.allowedUsers.includes(normalizedUserType)
   );
 
   const handleLogout = () => {

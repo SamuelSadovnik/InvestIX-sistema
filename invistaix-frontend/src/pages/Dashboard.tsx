@@ -1,14 +1,15 @@
 import React from 'react';
-import { 
-  Home, 
-  Users, 
-  UserPlus, 
+import {
+  Home,
+  Users,
+  UserPlus,
   ArrowUpRight,
   DollarSign,
   TrendingUp,
   LineChart,
   Building
 } from 'lucide-react';
+import { normalizeUserType } from '@/lib/utils';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import PerformanceChart from '@/components/charts/PerformanceChart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,19 +36,22 @@ import {
   resultData
 } from '@/data/mockData';
 
+
 const Dashboard = () => {
   const { userType } = useAuth();
+  const normalizedUserType = normalizeUserType(userType);
+  
   let welcomeTitle = '';
   let welcomeDesc = '';
   let boxClass = 'bg-green-50 border border-green-200';
 
-  if (userType === 'admin') {
+  if (normalizedUserType === 'admin') {
     welcomeTitle = 'Bem-vindo, Administrador!';
     welcomeDesc = 'Você possui controle total do sistema.';
-  } else if (userType === 'gestor') {
+  } else if (normalizedUserType === 'gestor') {
     welcomeTitle = 'Bem-vindo, Gestor!';
     welcomeDesc = 'Gerencie imóveis, receitas e despesas.';
-  } else if (userType === 'proprietario') {
+  } else if (normalizedUserType === 'proprietario') {
     welcomeTitle = 'Bem-vindo, Proprietário!';
     welcomeDesc = 'Veja seus imóveis e receitas.';
   }
@@ -95,7 +99,7 @@ const Dashboard = () => {
             trend={{ value: 20, isPositive: true }}
           />
         </div>
-        {userType !== 'proprietario' && (
+        {normalizedUserType !== 'proprietario' && (
           <DashboardCard
             title="Total de Proprietários"
             value={totalOwners}
@@ -104,7 +108,7 @@ const Dashboard = () => {
             trend={{ value: 5, isPositive: true }}
           />
         )}
-        {userType === 'admin' && (
+        {normalizedUserType === 'admin' && (
           <DashboardCard
             title="Total de Gestores"
             value={totalManagers}

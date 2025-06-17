@@ -37,7 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Adiciona CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS with our configuration
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/proprietarios/**").hasAuthority("ROLE_ADMIN")
@@ -51,37 +51,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Permite apenas o frontend específico
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        
-        // Métodos HTTP permitidos
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173")); // Use allowedOriginPatterns
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        // Headers permitidos
-        configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization", 
-            "Content-Type", 
-            "X-Requested-With",
-            "Accept",
-            "Origin",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers"
-        ));
-        
-        // Headers expostos
-        configuration.setExposedHeaders(Arrays.asList(
-            "Access-Control-Allow-Origin",
-            "Access-Control-Allow-Credentials"
-        ));
-        
-        // Permite credenciais
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         
-        // Configura para todos os endpoints da API
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
-
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

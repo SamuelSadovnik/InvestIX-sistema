@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProprietarioRepository extends JpaRepository<Proprietario, Integer> {
-
+public interface ProprietarioRepository extends JpaRepository<Proprietario, Integer> {       
     @Query("SELECT p, COUNT(i) " +
            "FROM Proprietario p " +
            "LEFT JOIN Imovel i ON p.id = i.proprietario.id " +
