@@ -41,14 +41,13 @@ const App = () => (
                 }>
                   <Route index element={<Dashboard />} />
                   <Route path="imoveis" element={<Imoveis />} />
-                  <Route path="imoveis/:id" element={<PropertyDetail />} />
-                  <Route path="proprietarios" element={
-                    <ProtectedRoute allowedRoles={['admin', 'gestor']}>
+                  <Route path="imoveis/:id" element={<PropertyDetail />} />                  <Route path="proprietarios" element={
+                    <ProtectedRoute allowedRoles={['ADMIN', 'GESTOR']}>
                       <Proprietarios />
                     </ProtectedRoute>
                   } />
                   <Route path="gestores" element={
-                    <ProtectedRoute allowedRoles={['admin']}>
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
                       <Gestores />
                     </ProtectedRoute>
                   } />

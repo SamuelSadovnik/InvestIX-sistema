@@ -41,7 +41,7 @@ export default function ProprietariosStepByStep() {
           </p>
         </div>
         
-        {userType === 'admin' && (
+        {userType === 'ADMIN' && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="invistaix-gradient">

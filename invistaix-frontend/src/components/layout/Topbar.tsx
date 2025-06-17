@@ -27,15 +27,14 @@ const Topbar = () => {
   const handleConfigClick = () => {
     navigate('/dashboard/configuracoes');
   };
-
   // Avatar initials
-  const initials = userType === 'admin' ? 'AD' : userType === 'gestor' ? 'GE' : userType === 'proprietario' ? 'PR' : 'US';
+  const initials = userType === 'ADMIN' ? 'AD' : userType === 'GESTOR' ? 'GE' : userType === 'PROPRIETARIO' ? 'PR' : 'US';
   // Nome completo
-  const fullName = userType === 'admin' ? 'Administrator' : userType === 'gestor' ? 'Gestor' : userType === 'proprietario' ? 'Proprietario' : 'Usuário';
+  const fullName = userType === 'ADMIN' ? 'Administrator' : userType === 'GESTOR' ? 'Gestor' : userType === 'PROPRIETARIO' ? 'Proprietario' : 'Usuário';
   // Email
-  const email = userType === 'admin' ? 'admin@invistaix.com' : userType === 'gestor' ? 'gestor@invistaix.com' : userType === 'proprietario' ? 'proprietario@invistaix.com' : 'usuario@invistaix.com';
+  const email = userType === 'ADMIN' ? 'admin@invistaix.com' : userType === 'GESTOR' ? 'gestor@invistaix.com' : userType === 'PROPRIETARIO' ? 'proprietario@invistaix.com' : 'usuario@invistaix.com';
   // Tipo
-  const tipo = userType === 'admin' ? 'Administrador' : userType === 'gestor' ? 'Gestor' : userType === 'proprietario' ? 'Proprietario' : 'Usuário';
+  const tipo = userType === 'ADMIN' ? 'Administrador' : userType === 'GESTOR' ? 'Gestor' : userType === 'PROPRIETARIO' ? 'Proprietario' : 'Usuário';
 
   return (
     <header className="border-b bg-background px-4 py-3 flex items-center justify-end">

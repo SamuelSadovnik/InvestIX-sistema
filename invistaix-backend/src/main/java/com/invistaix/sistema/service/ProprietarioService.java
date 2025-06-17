@@ -91,12 +91,11 @@ public class ProprietarioService {
     }
 
     // Deletar um proprietário por ID
-    public void delete(Integer id) {
-        // Verifica se o proprietário existe antes de deletar
+    public void delete(Integer id) {        // Verifica se o proprietário existe antes de deletar
         findById(id);
         
         // Check if the owner has any properties
-        Long propertyCount = proprietarioRepository.countByProprietarioId(id.longValue());
+        Long propertyCount = proprietarioRepository.countByProprietarioId(id);
         if (propertyCount > 0) {
             throw new RuntimeException("Não é possível excluir o proprietário pois ele possui imóveis associados");
         }

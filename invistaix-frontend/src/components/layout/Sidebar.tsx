@@ -18,43 +18,42 @@ const Sidebar = () => {
   const location = useLocation();
   const { logout, userType } = useAuth();
   const normalizedUserType = normalizeUserType(userType);
-  
-  const allMenuItems = [
+    const allMenuItems = [
     {
       title: "Dashboard",
       path: "/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
-      allowedUsers: ['admin', 'gestor', 'proprietario']
+      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
     },
     {
       title: "Imóveis",
       path: "/dashboard/imoveis",
       icon: <Home className="h-5 w-5" />,
-      allowedUsers: ['admin', 'gestor', 'proprietario']
+      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
     },
     {
       title: "Proprietários",
       path: "/dashboard/proprietarios",
       icon: <Users className="h-5 w-5" />,
-      allowedUsers: ['admin', 'gestor']
+      allowedUsers: ['ADMIN', 'GESTOR']
     },
     {
       title: "Gestores",
       path: "/dashboard/gestores",
       icon: <UserPlus className="h-5 w-5" />,
-      allowedUsers: ['admin']
+      allowedUsers: ['ADMIN']
     },
     {
       title: "Financeiro",
       path: "/dashboard/financeiro",
       icon: <DollarSign className="h-5 w-5" />,
-      allowedUsers: ['admin', 'gestor', 'proprietario']
+      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
     },
     {
       title: "Performance",
       path: "/dashboard/performance",
       icon: <BarChart3 className="h-5 w-5" />,
-      allowedUsers: ['admin', 'gestor', 'proprietario']
+      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
     }
   ];
 

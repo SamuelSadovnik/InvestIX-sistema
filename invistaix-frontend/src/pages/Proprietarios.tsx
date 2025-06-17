@@ -154,12 +154,11 @@ export default function Proprietarios() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">        <div>
           <h1 className="text-2xl md:text-3xl font-bold">Proprietários</h1>
           <p className="text-muted-foreground">Gerencie os proprietários de imóveis</p>
         </div>
-        {userType === 'admin' && (
+        {userType === 'ADMIN' && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="invistaix-gradient">

@@ -58,7 +58,7 @@ const Properties = () => {
           <h1 className="text-2xl md:text-3xl font-bold">Imóveis</h1>
           <p className="text-muted-foreground">Gerencie sua carteira de imóveis</p>
         </div>
-        {userType !== 'proprietario' && (
+        {userType !== 'PROPRIETARIO' && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="invistaix-gradient">

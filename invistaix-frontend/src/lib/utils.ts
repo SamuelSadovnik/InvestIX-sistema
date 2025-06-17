@@ -7,5 +7,5 @@ export function cn(...inputs: ClassValue[]) {
 
 export function normalizeUserType(userType: string | null): string {
   if (!userType) return '';
-  return userType.toLowerCase();
+  return userType; // Preserva o caso (maiúsculas/minúsculas)
 }

@@ -123,7 +123,7 @@ const Owners = () => {
           <h1 className="text-2xl md:text-3xl font-bold">Proprietários</h1>
           <p className="text-muted-foreground">Gerencie os proprietários de imóveis</p>
         </div>
-        {userType === 'admin' && (
+        {userType === 'ADMIN' && (
           <Dialog>
             <DialogTrigger asChild>
               <Button className="invistaix-gradient">
