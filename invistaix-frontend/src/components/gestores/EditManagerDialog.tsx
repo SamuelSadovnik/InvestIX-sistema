@@ -14,35 +14,29 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { Gestor } from '@/services/gestorService';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
-  phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  cpf: z.string().min(11, 'CPF deve ter pelo menos 11 dígitos'),
+  senha: z.string().min(6,  "Senha deve ter pelo menos 6 caracteres." ),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-interface Manager {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role?: string;
-  properties: string[];
-  isOwner?: boolean;
-}
-
 interface EditManagerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  manager: Manager;
+  manager: Gestor;
   onUpdate: (data: FormData) => void;
 }
 
@@ -55,9 +49,11 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: manager.name,
+      nome: manager.nome,
       email: manager.email,
-      phone: manager.phone,
+      telefone: manager.telefone,
+      cpf: manager.cpf,
+      senha: manager.senha
     },
   });
 
@@ -81,12 +77,26 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome Completo</FormLabel>
                     <FormControl>
                       <Input placeholder="Nome do gestor" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="cpf"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CPF</FormLabel>
+                    <FormControl>
+                      <Input placeholder="000.000.000-00" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -109,9 +119,9 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="telefone"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
+                  <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
                       <Input placeholder="(00) 00000-0000" {...field} />
@@ -120,15 +130,35 @@ export const EditManagerDialog: React.FC<EditManagerDialogProps> = ({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="senha"
+                render={({ field }) => (
+                <FormItem className="form-field-container">
+                  <FormLabel className="text-sm">Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Digite uma senha segura"
+                      {...field}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Senha com pelo menos 6 caracteres
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+                )}
+              />
             </div>
 
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit">
-                Salvar Alterações
-              </Button>
+              <Button type="submit">Salvar Alterações</Button>
             </div>
           </form>
         </Form>

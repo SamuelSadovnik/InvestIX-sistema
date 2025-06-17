@@ -1,10 +1,11 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { FormDescription } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Proprietario } from '@/services/proprietarioService';
+import type { Proprietario } from '@/hooks/useProprietario';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ const formSchema = z.object({
   cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
+  senha: z.string().min(6,  "Senha deve ter pelo menos 6 caracteres." ),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -55,6 +57,7 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
       cpfCnpj: owner.cpfCnpj,
       email: owner.email,
       telefone: owner.telefone,
+      senha: owner.senha,
     },
   });
 
@@ -128,6 +131,28 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
                     </FormControl>
                     <FormMessage />
                   </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="senha"
+                render={({ field }) => (
+                <FormItem className="form-field-container">
+                  <FormLabel className="text-sm">Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Digite uma senha segura"
+                      {...field}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Senha com pelo menos 6 caracteres
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
                 )}
               />
             </div>
