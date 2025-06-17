@@ -19,21 +19,10 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Inte
     List<Object[]> findAllProprietariosWithImovelCount();
 
     @Query("SELECT COUNT(i) FROM Imovel i WHERE i.proprietario.id = :proprietarioId")
-    Long countByProprietarioId(@Param("proprietarioId") Long proprietarioId);
+    Long countByProprietarioId(@Param("proprietarioId") Integer proprietarioId);
 
     Optional<Proprietario> findByEmail(String email);
     Optional<Proprietario> findByTelefone(String telefone);
     Optional<Proprietario> findByCpfCnpj(String cpfCnpj);
     boolean existsByEmail(String email);
-
-    // Contar quantos registros da entidade `Imovel` estão associados a um proprietário específico
-    @Query("SELECT p, COUNT(i) " +
-           "FROM Proprietario p " +
-           "LEFT JOIN Imovel i ON p.id = i.proprietario.id " +
-           "GROUP BY p.id")
-    List<Object[]> findAllProprietariosWithImovelCount();
-
-    // Conta o número de registros da entidade `Imovel` associados a cada `Proprietario`
-    @Query("SELECT COUNT(i) FROM Imovel i WHERE i.proprietario.id = :proprietarioId")
-    Long countByProprietarioId(@Param("proprietarioId") Integer proprietarioId);
 }
