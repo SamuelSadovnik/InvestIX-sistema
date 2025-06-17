@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { criarProprietario } from '@/services/proprietarioService';
+import { criarProprietario } from '@/hooks/useProprietario';
 import {
   Form,
   FormControl,
@@ -24,12 +24,7 @@ const formSchema = z.object({
   cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
-  username: z.string().min(3, {
-    message: "Usuário deve ter pelo menos 3 caracteres.",
-  }),
-  password: z.string().min(6, {
-    message: "Senha deve ter pelo menos 6 caracteres.",
-  }),
+  senha: z.string().min(6,  "Senha deve ter pelo menos 6 caracteres." ),
   properties: z.array(z.string()).optional(),
 });
 
@@ -47,8 +42,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
       cpfCnpj: '',
       email: '',
       telefone: '',
-      username: "",
-      password: "",
+      senha: '',
       properties: [],
     },
   });
@@ -70,7 +64,8 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6 proprietario-form">
-        <Card>          <CardHeader className="pb-3 sm:pb-6">
+        <Card>          
+          <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Informações Pessoais</CardTitle>
             <CardDescription className="text-sm">Dados básicos do proprietário</CardDescription>
           </CardHeader>          
@@ -119,7 +114,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
                 control={form.control}
                 name="telefone"
                 render={({ field }) => (
-                  <FormItem className="sm:col-span-2 form-field-container">
+                  <FormItem className="form-field-container">
                     <FormLabel className="text-sm">Telefone</FormLabel>
                     <FormControl>
                       <Input placeholder="(00) 00000-0000" {...field} className="text-sm" />
@@ -128,11 +123,33 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="senha"
+                render={({ field }) => (
+                <FormItem className="form-field-container">
+                  <FormLabel className="text-sm">Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Digite uma senha segura"
+                      {...field}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Senha com pelo menos 6 caracteres
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+                )}
+              />
             </div>
           </CardContent>
         </Card>
 
-        <Card>          <CardHeader className="pb-3 sm:pb-6">
+        <Card>          
+          <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Imóveis Associados</CardTitle>
             <CardDescription className="text-sm">Selecione os imóveis que pertencem a este proprietário</CardDescription>
           </CardHeader>
@@ -149,7 +166,8 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
                         control={form.control}
                         name="properties"
                         render={({ field }) => {
-                          return (                            <FormItem
+                          return (                            
+                          <FormItem
                               key={property.id}
                               className="flex flex-row items-start space-x-3 space-y-0 mb-3"
                             >
@@ -187,48 +205,8 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
             />
           </CardContent>
         </Card>
-
-        <Card>          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="text-lg sm:text-xl">Acesso à Plataforma</CardTitle>
-            <CardDescription className="text-sm">Defina as credenciais de acesso</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem className="form-field-container">
-                    <FormLabel className="text-sm">Usuário</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome de usuário para login" {...field} className="text-sm" />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      Nome que será usado para acessar o sistema
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="form-field-container">
-                    <FormLabel className="text-sm">Senha</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Digite uma senha segura" {...field} className="text-sm" />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      Senha com pelo menos 6 caracteres
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </CardContent>
-        </Card>        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 pb-4">
+ 
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 pb-4">
           <Button type="button" variant="outline" onClick={onSuccess} className="w-full sm:w-auto text-sm">
             Cancelar
           </Button>

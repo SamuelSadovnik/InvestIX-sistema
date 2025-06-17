@@ -40,7 +40,7 @@ import AddOwnerForm from '@/components/proprietarios/AddOwnerForm';
 import { EditOwnerDialog } from '@/components/proprietarios/EditOwnerDialog';
 import { OwnerDetailsDialog } from '@/components/proprietarios/OwnerDetailsDialog';
 import { DeleteOwnerDialog } from '@/components/proprietarios/DeleteOwnerDialog';
-import { atualizarProprietario, listarProprietarios, Proprietario } from '@/services/proprietarioService';
+import { atualizarProprietario, listarProprietarios, Proprietario } from '@/hooks/useProprietario';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 

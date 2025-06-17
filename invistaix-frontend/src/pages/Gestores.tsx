@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   UserPlus, 
   Plus, 
@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { properties } from '@/data/mockData';
 import { 
   Dialog, 
@@ -27,15 +26,16 @@ import {
   DialogTitle, 
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useManagers } from '@/hooks/useManagers';
 import { AddManagerForm } from '@/components/gestores/AddManagerForm';
 import { EditManagerDialog } from '@/components/gestores/EditManagerDialog';
 import { ManagerDetailsDialog } from '@/components/gestores/ManagerDetailsDialog';
 import { DeleteManagerDialog } from '@/components/gestores/DeleteManagerDialog';
+import { Gestor, listarGestores, criarGestor, atualizarGestor, deletarGestor } from '@/hooks/useGestor';
 import { toast } from 'sonner';
 
 export default function Gestores() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [managers, setManagers] = useState<Gestor[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editDialog, setEditDialog] = useState<{ isOpen: boolean; manager: any }>({
     isOpen: false,
@@ -50,20 +50,58 @@ export default function Gestores() {
     managerId: '',
     managerName: '',
   });
-  
-  const { managers, addManager, updateManager, deleteManager } = useManagers();
-  
+
+  useEffect(() => {
+    async function carregarGestores() {
+      try {
+        const data = await listarGestores();
+        setManagers(data);
+      } catch (error) {
+        console.error('Erro ao listar gestores:', error);
+      }
+    }
+
+    carregarGestores();
+  }, []);
+
+  const addManager = async (data: Gestor) => {
+    try {
+      const novo = await criarGestor(data);
+      setManagers(prev => [...prev, novo]);
+    } catch (error) {
+      console.error('Erro ao criar gestor:', error);
+    }
+  };
+
+  const updateManager = async (id: number, data: Gestor) => {
+    try {
+      const atualizado = await atualizarGestor(id, data);
+      setManagers(prev => prev.map(g => g.id === id ? atualizado : g));
+      toast.success(`Gestor atualizado com sucesso.`);
+    } catch (error) {
+      console.error('Erro ao atualizar gestor:', error);
+    }
+  };
+
+  const deleteManager = async (id: number) => {
+    try {
+      await deletarGestor(id);
+      setManagers(prev => prev.filter(g => g.id !== id));
+    } catch (error) {
+      console.error('Erro ao remover gestor:', error);
+    }
+  };
+
   const filteredManagers = managers.filter(manager => {
-    const matchesSearch = manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          manager.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch = manager.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           manager.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
   const handleAddManager = (data: any) => {
     addManager(data);
     setIsAddDialogOpen(false);
-    toast.success(`${data.name} foi adicionado com sucesso.`);
+    toast.success(`${data.nome} foi adicionado com sucesso.`);
   };
 
   const handleEditClick = (manager: any) => {
@@ -75,11 +113,7 @@ export default function Gestores() {
   };
 
   const handleDeleteClick = (managerId: string, managerName: string) => {
-    setDeleteDialog({
-      isOpen: true,
-      managerId,
-      managerName,
-    });
+    setDeleteDialog({ isOpen: true, managerId, managerName });
   };
 
   const handleUpdateManager = (data: any) => {
@@ -106,7 +140,8 @@ export default function Gestores() {
               <Plus className="h-4 w-4 mr-2" />
               Cadastrar Gestor
             </Button>
-          </DialogTrigger>          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
+          </DialogTrigger>          
+          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader className="pb-2 sm:pb-4">
               <DialogTitle className="text-lg sm:text-xl">Cadastrar Novo Gestor</DialogTitle>
               <DialogDescription className="text-sm">
@@ -148,13 +183,13 @@ export default function Gestores() {
             {filteredManagers.length > 0 ? (
               filteredManagers.map((manager) => {
                 const managerProperties = properties.filter(p => 
-                  manager.properties.includes(p.id)
+                  (manager.properties || []).includes(p.id)
                 );
                 return (
                   <TableRow key={manager.id}>
-                    <TableCell className="font-medium">{manager.name}</TableCell>
+                    <TableCell className="font-medium">{manager.nome}</TableCell>
                     <TableCell>{manager.email}</TableCell>
-                    <TableCell>{manager.phone}</TableCell>
+                    <TableCell>{manager.telefone}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Building className="h-4 w-4 mr-1 text-muted-foreground" />

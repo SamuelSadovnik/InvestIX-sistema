@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { deletarProprietario } from '@/services/proprietarioService';
+import { deletarProprietario } from '@/hooks/useProprietario';
 
 interface DeleteOwnerDialogProps {
   isOpen: boolean;

@@ -4,22 +4,22 @@ import com.invistaix.sistema.enums.UserType;
 import com.invistaix.sistema.model.AuthenticatedUser;
 
 public class UserDto {
-    private String id;
+    private Integer id;
     private String email;
     private String username;
     private UserType userType;
 
     public UserDto(AuthenticatedUser user) {
-        this.id = user.getId().toString();
+        this.id = user.getId();
         this.email = user.getEmail();
         this.username = user.getNome();
         this.userType = user.getUserType();
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
