@@ -3,6 +3,7 @@ package com.invistaix.sistema.service;
 import com.invistaix.sistema.model.Gestor;
 import com.invistaix.sistema.repository.GestorRepository;
 import com.invistaix.sistema.repository.ImovelRepository;
+import com.invistaix.sistema.util.PasswordEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,15 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class GestorService {
-
-    @Autowired
+public class GestorService {    @Autowired
     private GestorRepository gestorRepository;
     
     @Autowired
     private ImovelRepository imovelRepository;
-
-    // Criar ou atualizar um gestor
+    
+    @Autowired
+    private PasswordEncoderUtil passwordEncoderUtil;    // Criar ou atualizar um gestor
     public Gestor save(Gestor gestor) {
         // Verifica se já existe um gestor com o mesmo email ou CPF
         Optional<Gestor> existingByEmail = gestorRepository.findByEmail(gestor.getEmail());
@@ -29,6 +29,18 @@ public class GestorService {
         if (existingByCpf.isPresent() && !existingByCpf.get().getId().equals(gestor.getId())) {
             throw new RuntimeException("CPF " + gestor.getCpf() + " já está em uso");
         }
+        
+        // Criptografar a senha antes de salvar (apenas se for um novo gestor ou se a senha foi modificada)
+        if (gestor.getId() == null) {
+            gestor.setSenha(passwordEncoderUtil.encodePassword(gestor.getSenha()));
+        } else if (existingByEmail.isPresent()) {
+            // Para atualizações, só criptografa se a senha foi alterada
+            Gestor existingGestor = existingByEmail.get();
+            if (!existingGestor.getSenha().equals(gestor.getSenha())) {
+                gestor.setSenha(passwordEncoderUtil.encodePassword(gestor.getSenha()));
+            }
+        }
+        
         return gestorRepository.save(gestor);
     }
 
@@ -49,9 +61,7 @@ public class GestorService {
             throw new RuntimeException("Gestor com ID " + id + " não encontrado");
         }
         return gestor.get();
-    }
-
-    // Atualizar um gestor existente
+    }    // Atualizar um gestor existente
     public Gestor update(Integer id, Gestor gestor) {
         // Verifica se o gestor existe
         Gestor existingGestor = findById(id);
@@ -60,7 +70,13 @@ public class GestorService {
         existingGestor.setEmail(gestor.getEmail());
         existingGestor.setTelefone(gestor.getTelefone());
         existingGestor.setCpf(gestor.getCpf());
-        existingGestor.setSenha(gestor.getSenha());
+        
+        // Se a senha foi alterada, aplica a nova senha
+        if (!gestor.getSenha().equals(existingGestor.getSenha())) {
+            existingGestor.setSenha(gestor.getSenha());
+            // A criptografia será feita no método save
+        }
+        
         // Salva o gestor atualizado (a validação de unicidade é feita no save)
         return save(existingGestor);
     }
