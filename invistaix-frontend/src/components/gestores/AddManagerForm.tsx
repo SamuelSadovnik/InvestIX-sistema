@@ -77,9 +77,8 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Informações Pessoais</CardTitle>
             <CardDescription className="text-sm">Dados básicos do gestor</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 card-content-form">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-60 sm:max-h-72 overflow-y-auto custom-scrollbar-form">
+          </CardHeader>          <CardContent className="space-y-4 card-content-form custom-scrollbar-form">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <FormField
                 control={form.control}
                 name="nome"
