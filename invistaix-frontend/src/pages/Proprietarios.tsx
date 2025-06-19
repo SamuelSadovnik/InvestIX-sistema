@@ -51,7 +51,6 @@ export default function Proprietarios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [ownerType, setOwnerType] = useState<string | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [properties, setProperties] = useState<PropertyType[]>([]);
   const [editDialog, setEditDialog] = useState<{ isOpen: boolean; owner: any }>({
     isOpen: false,
     owner: null,
@@ -128,7 +127,7 @@ export default function Proprietarios() {
     setDetailsDialog({ isOpen: true, owner });
   };
 
-  const handleDeleteClick = (ownerId: string, ownerName: string) => {
+  const handleDeleteClick = (ownerId: number, ownerName: string) => {
     setDeleteDialog({ isOpen: true, ownerId, ownerName });
   };
 
@@ -210,14 +209,13 @@ export default function Proprietarios() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredOwners.length > 0 ? (
           filteredOwners.map((owner) => {
-            const ownerProperties = properties.filter(p => p.owner === owner.id);
             const type = getOwnerType(owner.cpfCnpj);
             return (
               <Card key={owner.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">{owner.nome}</CardTitle>
-                    <Badge 
+                    <Badge
                       className={type === 'PF' ? 'bg-invistaix-100 text-invistaix-400 hover:bg-invistaix-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}
                     >
                       {type === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}
@@ -225,8 +223,8 @@ export default function Proprietarios() {
                   </div>
                   <CardDescription className="flex items-center mt-1">
                     <Building className="h-3 w-3 mr-1" />
-                    {ownerProperties.length > 0 
-                      ? `${ownerProperties.length} imóvel(is)` 
+                    {owner.quantidadeImoveis > 0
+                      ? `${owner.quantidadeImoveis} imóvel(is)`
                       : 'Nenhum imóvel cadastrado'}
                   </CardDescription>
                 </CardHeader>
@@ -308,10 +306,9 @@ export default function Proprietarios() {
           onClose={() =>
             setDeleteDialog({ isOpen: false, ownerId: null, ownerName: '' })
           }
-          onConfirm={handleAfterDelete}
           ownerId={deleteDialog.ownerId}
           ownerName={deleteDialog.ownerName}
-          onAfterDelete={carregarProprietarios}
+          onAfterDelete={handleAfterDelete}
         />
       )}
     </div>

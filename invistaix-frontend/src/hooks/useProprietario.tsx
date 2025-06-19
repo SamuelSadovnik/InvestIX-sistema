@@ -7,6 +7,7 @@ export interface Proprietario {
   telefone: string;
   cpfCnpj: string;
   senha: string;
+  quantidadeImoveis?: number;
 }
 
 function getAuthHeaders(): HeadersInit {
@@ -32,6 +33,24 @@ export const listarProprietarios = async (): Promise<Proprietario[]> => {
   } catch (error) {
     console.error('Erro na requisição:', error);
     console.log(localStorage.getItem('token'));
+    throw error;
+  }
+};
+
+export const getPropertiesByOwner = async (ownerId: number): Promise<any[]> => {
+  try {
+    const response = await fetch(`${API_URL}/imoveis?proprietarioId=${ownerId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro ao buscar imóveis:', error);
     throw error;
   }
 };

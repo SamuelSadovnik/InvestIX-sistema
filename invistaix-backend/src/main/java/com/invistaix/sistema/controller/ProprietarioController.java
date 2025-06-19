@@ -1,9 +1,13 @@
 package com.invistaix.sistema.controller;
 
 import com.invistaix.sistema.model.Proprietario;
+import com.invistaix.sistema.model.AuthenticatedUser;
 import com.invistaix.sistema.service.ProprietarioService;
+import com.invistaix.sistema.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +15,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/proprietarios")
 public class ProprietarioController {
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Autowired
     private ProprietarioService proprietarioService;
@@ -25,10 +32,18 @@ public class ProprietarioController {
         return ResponseEntity.ok(savedProprietario);
     }
 
-    // Listar todos os proprietários
+    // Listar todos os proprietários (admin) ou proprietários associados ao gestor
     @GetMapping
-    public ResponseEntity<List<Proprietario>> getAllProprietarios() {
-        List<Proprietario> proprietarios = proprietarioService.findAll();
+    public ResponseEntity<List<Proprietario>> getAllProprietarios(Authentication authentication) {
+        Integer gestorId = null;
+        
+        // Check if user is a gestor
+        if (authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_GESTOR"))) {
+            // Get gestor ID from authentication principal
+            gestorId = ((AuthenticatedUser) authentication.getPrincipal()).getId();
+        }
+        
+        List<Proprietario> proprietarios = proprietarioService.findAll(gestorId);
         return ResponseEntity.ok(proprietarios);
     }
 

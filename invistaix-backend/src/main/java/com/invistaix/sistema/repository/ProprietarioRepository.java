@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProprietarioRepository extends JpaRepository<Proprietario, Integer> {       
+public interface ProprietarioRepository extends JpaRepository<Proprietario, Integer> {
     @Query("SELECT p, COUNT(i) " +
            "FROM Proprietario p " +
            "LEFT JOIN Imovel i ON p.id = i.proprietario.id " +
@@ -24,4 +24,9 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Inte
     Optional<Proprietario> findByTelefone(String telefone);
     Optional<Proprietario> findByCpfCnpj(String cpfCnpj);
     boolean existsByEmail(String email);
+    
+    @Query("SELECT DISTINCT p FROM Proprietario p " +
+           "JOIN Imovel i ON i.proprietario.id = p.id " +
+           "WHERE i.gestor.id = :gestorId")
+    List<Proprietario> findByGestorId(@Param("gestorId") Integer gestorId);
 }

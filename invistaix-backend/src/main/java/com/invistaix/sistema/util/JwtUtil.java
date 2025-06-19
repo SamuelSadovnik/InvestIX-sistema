@@ -62,6 +62,10 @@ public class JwtUtil {
     public Integer getUserIdFromToken(String token) {
         return (Integer) getAllClaimsFromToken(token).get("userId");
     }
+    
+    public String getUsernameFromToken(String token) {
+        return (String) getAllClaimsFromToken(token).get("username");
+    }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);

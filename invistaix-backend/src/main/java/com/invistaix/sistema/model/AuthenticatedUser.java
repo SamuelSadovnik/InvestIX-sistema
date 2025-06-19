@@ -29,6 +29,9 @@ public class AuthenticatedUser {
         this.email = admin.getEmail();
         this.userType = UserType.ADMIN;
     }
+    
+    public AuthenticatedUser() {
+    }
 
     // Getters e Setters
     public Integer getId() {

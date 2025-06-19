@@ -1,11 +1,11 @@
 package com.invistaix.sistema.util;
 
+import com.invistaix.sistema.model.AuthenticatedUser;
 import com.invistaix.sistema.enums.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -47,11 +47,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String role = "ROLE_" + userType.name();
                         logger.info("Authenticating user: " + email + " with role: " + role);
                         
-                        User principal = new User(email, "", List.of(new SimpleGrantedAuthority(role)));
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        AuthenticatedUser principal = new AuthenticatedUser();
+                        principal.setEmail(email);
+                        principal.setUserType(userType);
+                        principal.setId(jwtUtil.getUserIdFromToken(token));
+                        principal.setNome(jwtUtil.getUsernameFromToken(token));
+                        
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(principal, null, List.of(new SimpleGrantedAuthority(role)));
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 } else {
                     logger.warn("Invalid JWT token: " + token);

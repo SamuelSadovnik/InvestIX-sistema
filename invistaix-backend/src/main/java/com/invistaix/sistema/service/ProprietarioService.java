@@ -57,8 +57,11 @@ public class ProprietarioService {
         return proprietarioRepository.save(proprietario);
     }
 
-    // Listar todos os proprietários
-    public List<Proprietario> findAll() {
+    // Listar todos os proprietários (admin) ou proprietários associados ao gestor
+    public List<Proprietario> findAll(Integer gestorId) {
+        if (gestorId != null) {
+            return proprietarioRepository.findByGestorId(gestorId);
+        }
         return proprietarioRepository.findAll();
     }
 
@@ -83,7 +86,7 @@ public class ProprietarioService {
         
         // Atualiza a senha apenas se for fornecida
         if (proprietario.getSenha() != null && !proprietario.getSenha().isEmpty()) {
-            existingProprietario.setSenha(proprietario.getSenha());
+            existingProprietario.setSenha(passwordEncoder.encodePassword(proprietario.getSenha()));
         }
         
         // Salva o proprietário atualizado
