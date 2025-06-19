@@ -59,7 +59,8 @@ public class DataInitializer implements CommandLineRunner {
             proprietario.setNome("Maria Santos");
             proprietario.setEmail("proprietario@sistema.com");
             proprietario.setTelefone("11999999999");
-            proprietario.setCpfCnpj("98765432100");
+            proprietario.setDocumento("98765432100");
+            proprietario.setTipoDocumento(com.invistaix.sistema.model.TipoDocumento.CPF);
             proprietario.setSenha(passwordEncoderUtil.encodePassword("123"));
             proprietarioRepository.save(proprietario);
             System.out.println("✅ Proprietário criado: proprietario@sistema.com / 123");

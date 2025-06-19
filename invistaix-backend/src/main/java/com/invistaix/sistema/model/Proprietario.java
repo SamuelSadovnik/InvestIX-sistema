@@ -20,10 +20,14 @@ public class Proprietario {
     @Column(name = "telefone", nullable = false, length = 11, unique = true)
     private String telefone;
 
-    @Column(name = "cpf_cnpj", nullable = false, length = 14, unique = true)
-    private String cpfCnpj;
+    @Column(name = "documento", nullable = false, length = 14, unique = true)
+    private String documento;
 
-    @Column(name = "senha", nullable = true, length = 64)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_documento", nullable = false)
+    private TipoDocumento tipoDocumento;
+    
+    @Column(name = "senha", nullable = false, length = 60)
     private String senha;
 
     private Long quantidadeImoveis;
@@ -32,12 +36,13 @@ public class Proprietario {
     public Proprietario() {
     }
 
-    public Proprietario(Integer id, String nome, String email, String telefone, String cpfCnpj, Long quantidadeImoveis) {
+    public Proprietario(Integer id, String nome, String email, String telefone, String documento, TipoDocumento tipoDocumento, Long quantidadeImoveis) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.telefone = telefone;
-        this.cpfCnpj = cpfCnpj;
+        this.documento = documento;
+        this.tipoDocumento = tipoDocumento;
         this.quantidadeImoveis = quantidadeImoveis;
     }
 
@@ -82,12 +87,20 @@ public class Proprietario {
         this.telefone = telefone;
     }
 
-    public String getCpfCnpj() {
-        return cpfCnpj;
+    public String getDocumento() {
+        return documento;
     }
 
-    public void setCpfCnpj(String cpfCnpj) {
-        this.cpfCnpj = cpfCnpj;
+    public void setDocumento(String documento) {
+        this.documento = documento;
+    }
+
+    public TipoDocumento getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(TipoDocumento tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
     }
 
     public Long getQuantidadeImoveis() {

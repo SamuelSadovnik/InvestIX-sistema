@@ -56,6 +56,10 @@ public class Imovel {
     @Column(name = "numero_apartamentos")
     private Integer numeroApartamentos;
 
+    @Lob
+    @Column(name = "foto_imovel")
+    private byte[] fotoImovel;
+
     @ManyToMany
     @JoinTable(
         name = "IMOVEL_DESPESA",
@@ -215,5 +219,13 @@ public class Imovel {
 
     public void setNumeroApartamentos(Integer numeroApartamentos) {
         this.numeroApartamentos = numeroApartamentos;
+    }
+
+    public byte[] getFotoImovel() {
+        return fotoImovel;
+    }
+
+    public void setFotoImovel(byte[] fotoImovel) {
+        this.fotoImovel = fotoImovel;
     }
 }

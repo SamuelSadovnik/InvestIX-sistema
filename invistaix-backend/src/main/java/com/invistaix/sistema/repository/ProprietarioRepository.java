@@ -22,7 +22,7 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Inte
 
     Optional<Proprietario> findByEmail(String email);
     Optional<Proprietario> findByTelefone(String telefone);
-    Optional<Proprietario> findByCpfCnpj(String cpfCnpj);
+    Optional<Proprietario> findByDocumento(String documento);
     boolean existsByEmail(String email);
     
     @Query("SELECT DISTINCT p FROM Proprietario p " +

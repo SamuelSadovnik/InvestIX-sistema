@@ -29,9 +29,9 @@ public class ProprietarioService {
         if (existingByTelefone.isPresent() && !existingByTelefone.get().getId().equals(proprietario.getId())) {
             throw new RuntimeException("Telefone " + proprietario.getTelefone() + " já está em uso");
         }
-        Optional<Proprietario> existingByCpfCnpj = proprietarioRepository.findByCpfCnpj(proprietario.getCpfCnpj());
-        if (existingByCpfCnpj.isPresent() && !existingByCpfCnpj.get().getId().equals(proprietario.getId())) {
-            throw new RuntimeException("CPF/CNPJ " + proprietario.getCpfCnpj() + " já está em uso");
+        Optional<Proprietario> existingByDocumento = proprietarioRepository.findByDocumento(proprietario.getDocumento());
+        if (existingByDocumento.isPresent() && !existingByDocumento.get().getId().equals(proprietario.getId())) {
+            throw new RuntimeException("Documento " + proprietario.getDocumento() + " já está em uso");
         }
 
         // Se o proprietário já existe, verifica se a senha foi alterada
@@ -82,7 +82,8 @@ public class ProprietarioService {
         existingProprietario.setNome(proprietario.getNome());
         existingProprietario.setEmail(proprietario.getEmail());
         existingProprietario.setTelefone(proprietario.getTelefone());
-        existingProprietario.setCpfCnpj(proprietario.getCpfCnpj());
+        existingProprietario.setDocumento(proprietario.getDocumento());
+        existingProprietario.setTipoDocumento(proprietario.getTipoDocumento());
         
         // Atualiza a senha apenas se for fornecida
         if (proprietario.getSenha() != null && !proprietario.getSenha().isEmpty()) {

@@ -3,12 +3,12 @@ package com.invistaix.sistema.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ADMINS")
+@Table(name = "ADMINISTRADORES")
 public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "admin_id")
+    @Column(name = "administrador_id")
     private Integer id;
 
     @Column(name = "nome", nullable = false, length = 100)
@@ -17,7 +17,7 @@ public class Admin {
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name = "senha", nullable = false, length = 64)
+    @Column(name = "senha", nullable = false, length = 60)
     private String senha;
 
     // Construtores

@@ -20,7 +20,7 @@ public class Gestor {
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name = "telefone", length = 20)
+    @Column(name = "telefone", nullable = false, length = 11, unique = true)
     private String telefone;
 
     @Transient
