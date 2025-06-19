@@ -24,7 +24,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Property } from '@/data/mockData';
 import { listarProprietarios, Proprietario } from '@/hooks/useProprietario';
-import { listarGestores, Gestor } from '@/hooks/useGestor';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -41,7 +40,6 @@ const formSchema = z.object({
   bathrooms: z.number().optional(),
   area: z.number().optional(),
   owner: z.string().min(1, 'Proprietário é obrigatório'),
-  manager: z.string().min(1, 'Gestor é obrigatório'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -54,38 +52,22 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [proprietarios, setProprietarios] = useState<Proprietario[]>([]);
   const [isLoadingProprietarios, setIsLoadingProprietarios] = useState(true);
-  const [gestores, setGestores] = useState<Gestor[]>([]);
-  const [isLoadingGestores, setIsLoadingGestores] = useState(true);
 
   useEffect(() => {
-    const carregarDados = async () => {
+    const carregarProprietarios = async () => {
       setIsLoadingProprietarios(true);
-      setIsLoadingGestores(true);
-      
       try {
-        // Carregar proprietários
-        const proprietariosData = await listarProprietarios();
-        setProprietarios(proprietariosData);
+        const data = await listarProprietarios();
+        setProprietarios(data);
       } catch (error) {
         toast.error('Erro ao carregar proprietários');
         console.error('Erro ao carregar proprietários:', error);
       } finally {
         setIsLoadingProprietarios(false);
       }
-      
-      try {
-        // Carregar gestores
-        const gestoresData = await listarGestores();
-        setGestores(gestoresData);
-      } catch (error) {
-        toast.error('Erro ao carregar gestores');
-        console.error('Erro ao carregar gestores:', error);
-      } finally {
-        setIsLoadingGestores(false);
-      }
     };
 
-    carregarDados();
+    carregarProprietarios();
   }, []);
 
   const form = useForm<FormData>({
@@ -102,7 +84,6 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
       bathrooms: 0,
       area: 0,
       owner: '',
-      manager: '',
     },
   });
 
@@ -124,7 +105,6 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
         bathrooms: data.bathrooms,
         area: data.area,
         owner: data.owner,
-        manager: data.manager,
         performance: {
           percentage: 0,
           isPositive: true
@@ -392,56 +372,6 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
                             </FormLabel>
                             <p className="text-xs text-muted-foreground">
                               {proprietario.cpfCnpj} - {proprietario.email}
-                            </p>
-                          </div>
-                        </FormItem>
-                      ))}
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Seção de Gestores */}
-        <Card className="mb-4">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Gestor do Imóvel</CardTitle>
-            <CardDescription>Selecione o gestor deste imóvel</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <FormField
-              control={form.control}
-              name="manager"
-              render={({ field }) => (
-                <FormItem>
-                  {isLoadingGestores ? (
-                    <div className="text-sm text-muted-foreground">Carregando gestores...</div>
-                  ) : gestores.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">Nenhum gestor encontrado</div>
-                  ) : (
-                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                      {gestores.map((gestor) => (
-                        <FormItem
-                          key={gestor.id}
-                          className="flex flex-row items-start space-x-3 space-y-0 mb-3"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value === gestor.id.toString()}
-                              onCheckedChange={() => {
-                                field.onChange(gestor.id.toString());
-                              }}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-medium">
-                              {gestor.nome}
-                            </FormLabel>
-                            <p className="text-xs text-muted-foreground">
-                              {gestor.cpf} - {gestor.email}
                             </p>
                           </div>
                         </FormItem>
