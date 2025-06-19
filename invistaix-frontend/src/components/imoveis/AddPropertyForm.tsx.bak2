@@ -87,7 +87,6 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
 
     carregarDados();
   }, []);
-
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -109,8 +108,7 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // Simular criação do imóvel
-      const newProperty: Property = {
+      // Simular criação do imóvel      const newProperty: Property = {
         id: Date.now().toString(),
         name: data.name,
         type: data.type,
@@ -354,8 +352,7 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
             </div>
           </CardContent>
         </Card>
-        
-        {/* Seção de Proprietários */}
+          {/* Seção de Proprietários */}
         <Card className="mb-4">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Proprietário do Imóvel</CardTitle>

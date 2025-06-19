@@ -22,6 +22,7 @@ export interface Property {
     assessor: string;
   }>;
   owner: string;
+  manager?: string;
   performance?: {
     percentage: number;
     isPositive: boolean;
@@ -37,6 +38,16 @@ export interface Manager {
   role: string;
   properties: string[];
   isOwner?: boolean;
+}
+
+export interface Owner {
+  id: string;
+  name: string;
+  type: string;
+  document: string;
+  email: string;
+  phone: string;
+  properties: string[];
 }
 
 export interface Transaction {
