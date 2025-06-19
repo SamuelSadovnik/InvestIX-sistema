@@ -14,10 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { properties } from '@/data/mockData';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -25,7 +23,6 @@ const formSchema = z.object({
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   senha: z.string().min(6,  "Senha deve ter pelo menos 6 caracteres." ),
-  properties: z.array(z.string()).optional(),
 });
 
 interface AddOwnerFormProps {
@@ -34,8 +31,7 @@ interface AddOwnerFormProps {
 
 const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       nome: '',
@@ -43,7 +39,6 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
       email: '',
       telefone: '',
       senha: '',
-      properties: [],
     },
   });
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -145,66 +140,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
                 )}
               />
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>          
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="text-lg sm:text-xl">Imóveis Associados</CardTitle>
-            <CardDescription className="text-sm">Selecione os imóveis que pertencem a este proprietário</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <FormField
-              control={form.control}
-              name="properties"
-              render={() => (
-                <FormItem>
-                  <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                    {properties.map((property) => (
-                      <FormField
-                        key={property.id}
-                        control={form.control}
-                        name="properties"
-                        render={({ field }) => {
-                          return (                            
-                          <FormItem
-                              key={property.id}
-                              className="flex flex-row items-start space-x-3 space-y-0 mb-3"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(property.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...(field.value || []), property.id])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== property.id
-                                          )
-                                        )
-                                  }}
-                                />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel className="text-sm font-medium">
-                                  {property.name}
-                                </FormLabel>
-                                <p className="text-xs text-muted-foreground">
-                                  {property.type} - {property.address}
-                                </p>
-                              </div>
-                            </FormItem>
-                          )
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
+          </CardContent>        </Card>
  
         <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 pb-4">
           <Button type="button" variant="outline" onClick={onSuccess} className="w-full sm:w-auto text-sm">
