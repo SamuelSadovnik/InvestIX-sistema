@@ -47,6 +47,7 @@ public class DataInitializer implements CommandLineRunner {
             Gestor gestor = new Gestor();
             gestor.setNome("João Silva");
             gestor.setEmail("gestor@sistema.com");
+            gestor.setTelefone("11999999999");
             gestor.setCpf("12345678901");
             gestor.setSenha(passwordEncoderUtil.encodePassword("123"));
             gestorRepository.save(gestor);
