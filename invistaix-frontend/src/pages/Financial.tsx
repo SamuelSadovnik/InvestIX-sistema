@@ -6,17 +6,14 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   BarChart,
-  FileText,
   Download,
-  Filter,
-  Calendar
+  Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -167,12 +164,10 @@ const Financial = () => {
           </CardContent>
         </Card>
       </div>
-      
-      <Tabs defaultValue="transactions">
-        <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="transactions">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="transactions">Transações</TabsTrigger>
           <TabsTrigger value="charts">Gráficos</TabsTrigger>
-          <TabsTrigger value="reports">Relatórios</TabsTrigger>
         </TabsList>
         
         <TabsContent value="transactions" className="pt-6">
@@ -252,83 +247,7 @@ const Financial = () => {
             title="Resultado Financeiro" 
             description="Receitas - Despesas"
             data={resultData}
-            color="#8b5cf6"
-          />
-        </TabsContent>
-        
-        <TabsContent value="reports" className="pt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Relatórios Financeiros</CardTitle>
-              <CardDescription>Relatórios detalhados de desempenho financeiro</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                <Card className="hover-scale">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Relatório Mensal</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center text-muted-foreground mb-4">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Abril 2025</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Resumo detalhado de receitas, despesas e performance do mês.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Gerar Relatório
-                    </Button>
-                  </CardFooter>
-                </Card>
-                
-                <Card className="hover-scale">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Relatório Trimestral</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center text-muted-foreground mb-4">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Jan - Mar 2025</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Análise comparativa do desempenho financeiro trimestral.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Gerar Relatório
-                    </Button>
-                  </CardFooter>
-                </Card>
-                
-                <Card className="hover-scale">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Relatório Anual</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center text-muted-foreground mb-4">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span className="text-sm">2024</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Resumo consolidado de todo o ano com indicadores de performance.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Gerar Relatório
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
+            color="#8b5cf6"          />
         </TabsContent>
       </Tabs>
     </div>
