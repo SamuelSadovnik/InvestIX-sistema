@@ -21,6 +21,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { useGestores } from '@/hooks/useGestor';
 
 const formSchema = z.object({
   nome: z.string().min(2, {
@@ -39,12 +40,12 @@ const formSchema = z.object({
 });
 
 interface AddManagerFormProps {
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
   onCancel: () => void;
 }
 
-export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCancel }) => {
+export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onCancel }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { criarGestor } = useGestores();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,13 +56,13 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSubmit, onCanc
       senha: "",
     },
   });
-
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      onSubmit(values);
+      await criarGestor(values);
       form.reset();
       toast.success('Gestor cadastrado com sucesso!');
+      onCancel(); // Fecha o modal/form
     } catch (error) {
       toast.error('Erro ao cadastrar gestor');
       console.error('Erro:', error);

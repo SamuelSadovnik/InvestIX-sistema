@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { criarProprietario } from '@/hooks/useProprietario';
+import { useProprietarios } from '@/hooks/useProprietario';
 import {
   Form,
   FormControl,
@@ -31,6 +31,7 @@ interface AddOwnerFormProps {
 
 const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { criarProprietario } = useProprietarios();
     const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

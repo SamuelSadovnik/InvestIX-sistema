@@ -24,6 +24,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDashboard } from '@/contexts/DashboardContext';
 
 import { 
   properties, 
@@ -39,6 +40,7 @@ import {
 
 const Dashboard = () => {
   const { userType } = useAuth();
+  const { stats, loading, error } = useDashboard();
   const normalizedUserType = normalizeUserType(userType);
   
   let welcomeTitle = '';
@@ -55,9 +57,10 @@ const Dashboard = () => {
     welcomeDesc = 'Veja seus imóveis e receitas.';
   }
 
-  const totalProperties = properties.length;
-  const totalOwners = owners.length;
-  const totalManagers = managers.length;
+  // Usar dados reais da API ou fallback para dados mock se houver erro
+  const totalProperties = error ? properties.length : stats.totalImoveis;
+  const totalOwners = error ? owners.length : stats.totalProprietarios;
+  const totalManagers = error ? managers.length : stats.totalGestores;
   
   const totalRentIncome = transactions
     .filter(t => t.type === 'income' && t.category === 'Aluguel')
@@ -76,23 +79,26 @@ const Dashboard = () => {
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
-  
-  return (
+    return (
     <div className="space-y-6">
       <div className={`rounded-lg p-6 mb-6 ${boxClass}`}> 
         <h2 className="text-2xl font-semibold mb-1">{welcomeTitle}</h2>
         <p className="text-muted-foreground">{welcomeDesc}</p>
-      </div>      <div className={`grid gap-4 ${
+        {error && (
+          <div className="mt-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded p-2">
+            ⚠️ {error} (usando dados de exemplo)
+          </div>
+        )}
+      </div><div className={`grid gap-4 ${
         userType === 'PROPRIETARIO' 
           ? 'md:grid-cols-2' 
           : userType === 'GESTOR'
           ? 'md:grid-cols-4'
           : 'md:grid-cols-2 lg:grid-cols-4'
-      }`}>
-        <div className={userType === 'GESTOR' ? 'md:col-span-2' : ''}>
+      }`}>        <div className={userType === 'GESTOR' ? 'md:col-span-2' : ''}>
           <DashboardCard
             title="Total de Imóveis"
-            value={totalProperties}
+            value={loading ? "..." : totalProperties}
             description="Imóveis registrados no sistema"
             icon={<Home />}
             trend={{ value: 20, isPositive: true }}
@@ -101,7 +107,7 @@ const Dashboard = () => {
         {normalizedUserType !== 'PROPRIETARIO' && (
           <DashboardCard
             title="Total de Proprietários"
-            value={totalOwners}
+            value={loading ? "..." : totalOwners}
             description="Proprietários cadastrados"
             icon={<Users />}
             trend={{ value: 5, isPositive: true }}
@@ -110,7 +116,7 @@ const Dashboard = () => {
         {normalizedUserType === 'ADMIN' && (
           <DashboardCard
             title="Total de Gestores"
-            value={totalManagers}
+            value={loading ? "..." : totalManagers}
             description="Gestores ativos"
             icon={<UserPlus />}
             trend={{ value: 0, isPositive: true }}
