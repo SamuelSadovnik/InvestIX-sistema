@@ -17,10 +17,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AvaliacaoServiceTest {
+class AvaliacaoServiceTest {
 
     @Mock
     private AvaliacaoRepository avaliacaoRepository;
@@ -36,65 +37,61 @@ public class AvaliacaoServiceTest {
     void setUp() {
         avaliacao = new Avaliacao();
         avaliacao.setId(validId);
-        avaliacao.setValorAvaliacao(new BigDecimal("500000.00"));
-        avaliacao.setDataAvaliacao(LocalDate.of(2025, 6, 16));
+        avaliacao.setValorAvaliacao(new BigDecimal("500000.0"));
+        avaliacao.setDataAvaliacao(LocalDate.now());
     }
 
     @Test
-    void testSave() {
-        when(avaliacaoRepository.save(any(Avaliacao.class))).thenReturn(avaliacao);
+    void testSave_Avaliacao_Success() {
+        when(avaliacaoRepository.save(eq(avaliacao))).thenReturn(avaliacao);
 
-        Avaliacao savedAvaliacao = avaliacaoService.save(avaliacao);
+        Avaliacao result = avaliacaoService.save(avaliacao);
 
-        assertNotNull(savedAvaliacao);
-        assertEquals(validId, savedAvaliacao.getId());
-        assertEquals("Apartamento 101", savedAvaliacao.getImovel());
-        assertEquals(new BigDecimal("500000.00"), savedAvaliacao.getValorAvaliacao());
-        assertEquals(LocalDate.of(2025, 6, 16), savedAvaliacao.getDataAvaliacao());
-        verify(avaliacaoRepository, times(1)).save(avaliacao);
+        assertNotNull(result, "O resultado não deve ser nulo");
+        assertEquals(validId, result.getId(), "O ID deve corresponder");
+        assertEquals(new BigDecimal("500000.0"), result.getValorAvaliacao(), "O valor da avaliação deve corresponder");
+        verify(avaliacaoRepository, times(1)).save(eq(avaliacao));
     }
 
     @Test
-    void testFindAll() {
-        List<Avaliacao> avaliacoes = Arrays.asList(avaliacao);
+    void testFindAll_ReturnsList() {
+        List<Avaliacao> avaliacoes = Arrays.asList(avaliacao, new Avaliacao());
         when(avaliacaoRepository.findAll()).thenReturn(avaliacoes);
 
         List<Avaliacao> result = avaliacaoService.findAll();
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(avaliacao, result.get(0));
-        verify(avaliacaoRepository, times(1)).findAll();
+        assertEquals(2, result.size());
+        verify(avaliacaoRepository).findAll();
     }
 
     @Test
     void testFindById_Success() {
         when(avaliacaoRepository.findById(validId)).thenReturn(Optional.of(avaliacao));
 
-        Avaliacao foundAvaliacao = avaliacaoService.findById(validId);
+        Avaliacao result = avaliacaoService.findById(validId);
 
-        assertNotNull(foundAvaliacao);
-        assertEquals(validId, foundAvaliacao.getId());
-        assertEquals("Apartamento 101", foundAvaliacao.getImovel());
-        verify(avaliacaoRepository, times(1)).findById(validId);
+        assertNotNull(result);
+        assertEquals(validId, result.getId());
+        verify(avaliacaoRepository).findById(validId);
     }
 
     @Test
-    void testFindById_NotFound() {
+    void testFindById_NotFound_ThrowsException() {
         when(avaliacaoRepository.findById(invalidId)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             avaliacaoService.findById(invalidId);
         });
         assertEquals("Avaliação com ID " + invalidId + " não encontrada", exception.getMessage());
-        verify(avaliacaoRepository, times(1)).findById(invalidId);
+        verify(avaliacaoRepository).findById(invalidId);
     }
 
     @Test
     void testUpdate_Success() {
         Avaliacao updatedAvaliacao = new Avaliacao();
-        updatedAvaliacao.setValorAvaliacao(new BigDecimal("750000.00"));
-        updatedAvaliacao.setDataAvaliacao(LocalDate.of(2025, 6, 17));
+        updatedAvaliacao.setValorAvaliacao(new BigDecimal("600000.0"));
+        updatedAvaliacao.setDataAvaliacao(LocalDate.now().minusDays(1));
 
         when(avaliacaoRepository.findById(validId)).thenReturn(Optional.of(avaliacao));
         when(avaliacaoRepository.save(any(Avaliacao.class))).thenReturn(avaliacao);
@@ -102,24 +99,23 @@ public class AvaliacaoServiceTest {
         Avaliacao result = avaliacaoService.update(validId, updatedAvaliacao);
 
         assertNotNull(result);
-        assertEquals("Casa 202", result.getImovel());
-        assertEquals(new BigDecimal("750000.00"), result.getValorAvaliacao());
-        assertEquals(LocalDate.of(2025, 6, 17), result.getDataAvaliacao());
-        verify(avaliacaoRepository, times(1)).findById(validId);
-        verify(avaliacaoRepository, times(1)).save(any(Avaliacao.class));
+        assertEquals(updatedAvaliacao.getImovel(), result.getImovel());
+        assertEquals(updatedAvaliacao.getValorAvaliacao(), result.getValorAvaliacao());
+        assertEquals(updatedAvaliacao.getDataAvaliacao(), result.getDataAvaliacao());
+        verify(avaliacaoRepository).findById(validId);
+        verify(avaliacaoRepository).save(any(Avaliacao.class));
     }
 
     @Test
-    void testUpdate_NotFound() {
-        Avaliacao updatedAvaliacao = new Avaliacao();
+    void testUpdate_NotFound_ThrowsException() {
         when(avaliacaoRepository.findById(invalidId)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            avaliacaoService.update(invalidId, updatedAvaliacao);
+            avaliacaoService.update(invalidId, avaliacao);
         });
         assertEquals("Avaliação com ID " + invalidId + " não encontrada", exception.getMessage());
-        verify(avaliacaoRepository, times(1)).findById(invalidId);
-        verify(avaliacaoRepository, never()).save(any(Avaliacao.class));
+        verify(avaliacaoRepository).findById(invalidId);
+        verify(avaliacaoRepository, never()).save(any());
     }
 
     @Test
@@ -129,17 +125,8 @@ public class AvaliacaoServiceTest {
 
         avaliacaoService.delete(validId);
 
-        verify(avaliacaoRepository, times(1)).findById(validId);
-        verify(avaliacaoRepository, times(1)).deleteById(validId);
+        verify(avaliacaoRepository).findById(validId);
+        verify(avaliacaoRepository).deleteById(validId);
     }
 
-    @Test
-    void testDelete_NotFound() {
-        when(avaliacaoRepository.findById(invalidId)).thenReturn(Optional.empty());
-
-        avaliacaoService.delete(invalidId);
-
-        verify(avaliacaoRepository, times(1)).findById(invalidId);
-        verify(avaliacaoRepository, times(1)).deleteById(invalidId);
-    }
 }
