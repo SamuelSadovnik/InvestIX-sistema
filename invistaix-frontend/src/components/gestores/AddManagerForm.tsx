@@ -41,9 +41,10 @@ const formSchema = z.object({
 
 interface AddManagerFormProps {
   onCancel: () => void;
+  onSuccess?: () => void; // Adicionado callback de sucesso
 }
 
-export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onCancel }) => {
+export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onCancel, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { criarGestor } = useGestores();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,13 +56,18 @@ export const AddManagerForm: React.FC<AddManagerFormProps> = ({ onCancel }) => {
       cpf: "",
       senha: "",
     },
-  });
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  });  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
       await criarGestor(values);
       form.reset();
       toast.success('Gestor cadastrado com sucesso!');
+      
+      // Chamar o callback de sucesso se existir
+      if (onSuccess) {
+        onSuccess();
+      }
+      
       onCancel(); // Fecha o modal/form
     } catch (error) {
       toast.error('Erro ao cadastrar gestor');

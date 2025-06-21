@@ -44,6 +44,12 @@ import { atualizarProprietario, listarProprietarios, Proprietario } from '@/hook
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface PropertyType {
+  id: number;
+  owner: number;
+  // Add other property fields as needed
+}
+
 export default function Proprietarios() {
   const { userType } = useAuth();
   const [owners, setOwners] = useState<Proprietario[]>([]);
@@ -129,7 +135,7 @@ export default function Proprietarios() {
   };
 
   const handleDeleteClick = (ownerId: string, ownerName: string) => {
-    setDeleteDialog({ isOpen: true, ownerId, ownerName });
+    setDeleteDialog({ isOpen: true, ownerId: parseInt(ownerId), ownerName });
   };
 
   const handleUpdateOwner = async (data: any) => {
@@ -266,7 +272,7 @@ export default function Proprietarios() {
                       variant="ghost" 
                       size="icon" 
                       className="text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteClick(owner.id, owner.nome)}
+                      onClick={() => handleDeleteClick(owner.id.toString(), owner.nome)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -308,7 +314,6 @@ export default function Proprietarios() {
           onClose={() =>
             setDeleteDialog({ isOpen: false, ownerId: null, ownerName: '' })
           }
-          onConfirm={handleAfterDelete}
           ownerId={deleteDialog.ownerId}
           ownerName={deleteDialog.ownerName}
           onAfterDelete={carregarProprietarios}

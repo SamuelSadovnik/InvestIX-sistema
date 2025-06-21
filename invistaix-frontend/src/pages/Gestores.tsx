@@ -30,12 +30,12 @@ import { AddManagerForm } from '@/components/gestores/AddManagerForm';
 import { EditManagerDialog } from '@/components/gestores/EditManagerDialog';
 import { ManagerDetailsDialog } from '@/components/gestores/ManagerDetailsDialog';
 import { DeleteManagerDialog } from '@/components/gestores/DeleteManagerDialog';
-import { Gestor, listarGestores, criarGestor, atualizarGestor, deletarGestor } from '@/hooks/useGestor';
+import { Gestor, atualizarGestor, deletarGestor } from '@/hooks/useGestor';
+import { useGestores } from '@/hooks/useGestor';
 import { toast } from 'sonner';
 
 export default function Gestores() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [managers, setManagers] = useState<Gestor[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editDialog, setEditDialog] = useState<{ isOpen: boolean; manager: any }>({
     isOpen: false,
@@ -50,45 +50,42 @@ export default function Gestores() {
     managerId: '',
     managerName: '',
   });
+    // Usar o hook useGestores para obter os gestores e funções para manipulá-los
+  const { gestores: managers, isLoading, error, buscarGestores, criarGestor } = useGestores();
 
-  useEffect(() => {
-    async function carregarGestores() {
-      try {
-        const data = await listarGestores();
-        setManagers(data);
-      } catch (error) {
-        console.error('Erro ao listar gestores:', error);
-      }
-    }
-
-    carregarGestores();
-  }, []);
-
+  // Não precisamos mais deste useEffect, pois o hook já carrega os gestores automaticamente
+  
   const addManager = async (data: Gestor) => {
     try {
-      const novo = await criarGestor(data);
-      setManagers(prev => [...prev, novo]);
+      await criarGestor(data);
+      toast.success('Gestor cadastrado com sucesso!');
     } catch (error) {
       console.error('Erro ao criar gestor:', error);
+      toast.error('Erro ao cadastrar gestor');
     }
   };
 
   const updateManager = async (id: number, data: Gestor) => {
     try {
-      const atualizado = await atualizarGestor(id, data);
-      setManagers(prev => prev.map(g => g.id === id ? atualizado : g));
+      await atualizarGestor(id, data);
+      await buscarGestores(); // Recarrega a lista após atualização
       toast.success(`Gestor atualizado com sucesso.`);
     } catch (error) {
       console.error('Erro ao atualizar gestor:', error);
+      toast.error('Erro ao atualizar gestor');
     }
   };
-
-  const deleteManager = async (id: number) => {
+  const deleteManager = async (id: string) => {
     try {
-      await deletarGestor(id);
-      setManagers(prev => prev.filter(g => g.id !== id));
+      // Converter o ID para número, se necessário
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId)) throw new Error('ID inválido');
+      
+      await deletarGestor(numericId);
+      toast.success('Gestor removido com sucesso');
     } catch (error) {
       console.error('Erro ao remover gestor:', error);
+      toast.error('Erro ao remover gestor');
     }
   };
 
@@ -97,11 +94,8 @@ export default function Gestores() {
                            manager.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
-
-  const handleAddManager = (data: any) => {
-    addManager(data);
-    setIsAddDialogOpen(false);
-    toast.success(`${data.nome} foi adicionado com sucesso.`);
+  const handleAddSuccess = () => {
+    buscarGestores(); // Recarregar a lista de gestores após adicionar um novo
   };
 
   const handleEditClick = (manager: any) => {
@@ -147,10 +141,9 @@ export default function Gestores() {
               <DialogDescription className="text-sm">
                 Preencha os dados do gestor para adicioná-lo à equipe.
               </DialogDescription>
-            </DialogHeader>
-            <AddManagerForm 
-              onSubmit={handleAddManager}
+            </DialogHeader>            <AddManagerForm 
               onCancel={() => setIsAddDialogOpen(false)}
+              onSuccess={handleAddSuccess}
             />
           </DialogContent>
         </Dialog>
@@ -180,20 +173,19 @@ export default function Gestores() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredManagers.length > 0 ? (
-              filteredManagers.map((manager) => {
-                const managerProperties = properties.filter(p => 
-                  (manager.properties || []).includes(p.id)
-                );
+            {filteredManagers.length > 0 ? (              filteredManagers.map((manager) => {
+                // Remover a referência às propriedades por enquanto, pois não está no tipo Gestor
+                // const managerProperties = properties.filter(p => 
+                //   (manager.properties || []).includes(p.id)
+                // );
                 return (
                   <TableRow key={manager.id}>
                     <TableCell className="font-medium">{manager.nome}</TableCell>
                     <TableCell>{manager.email}</TableCell>
-                    <TableCell>{manager.telefone}</TableCell>
-                    <TableCell>
+                    <TableCell>{manager.telefone}</TableCell>                    <TableCell>
                       <div className="flex items-center">
                         <Building className="h-4 w-4 mr-1 text-muted-foreground" />
-                        <span>{managerProperties.length}</span>
+                        <span>0</span> {/* Temporariamente fixo até implementar a relação */}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -216,7 +208,7 @@ export default function Gestores() {
                           variant="ghost" 
                           size="icon" 
                           className="text-destructive"
-                          onClick={() => handleDeleteClick(manager.id, manager.name)}
+                          onClick={() => handleDeleteClick(manager.id.toString(), manager.nome)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -249,13 +241,12 @@ export default function Gestores() {
           manager={editDialog.manager}
           onUpdate={handleUpdateManager}
         />
-      )}
-
-      {detailsDialog.manager && (
+      )}      {detailsDialog.manager && (
         <ManagerDetailsDialog
           isOpen={detailsDialog.isOpen}
           onClose={() => setDetailsDialog({ isOpen: false, manager: null })}
           manager={detailsDialog.manager}
+          managedPropertiesIds={[]} // Temporariamente vazio até implementar a relação
         />
       )}
 

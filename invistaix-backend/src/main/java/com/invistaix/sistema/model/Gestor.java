@@ -2,8 +2,6 @@ package com.invistaix.sistema.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
-import java.util.ArrayList;
 
 @Entity
 @Table(name = "GESTORES")

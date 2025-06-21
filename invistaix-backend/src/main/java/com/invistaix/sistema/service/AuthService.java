@@ -131,6 +131,8 @@ public class AuthService {
                 admin.setSenha(encodedPassword);
                 adminRepository.save(admin);
                 break;
+            case PROPRIETARIO:
+                throw new UnsupportedOperationException("Proprietários não podem atualizar senhas");
         }
     }
 }
