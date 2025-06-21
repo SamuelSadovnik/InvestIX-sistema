@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Home, MapPin, Calendar, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
@@ -17,7 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-const PropertyDetail = () => {
+const DetalhesImovel = () => {
   const { id } = useParams<{ id: string }>();
   const property = properties.find(p => p.id === id);
 
@@ -215,4 +214,4 @@ const PropertyDetail = () => {
   );
 };
 
-export default PropertyDetail;
+export default DetalhesImovel;

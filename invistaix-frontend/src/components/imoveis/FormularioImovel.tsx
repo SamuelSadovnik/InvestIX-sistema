@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { User } from '@/contexts/AuthContext';
 import {
   Form,
   FormControl,
@@ -48,14 +49,25 @@ type FormData = z.infer<typeof formSchema>;
 
 interface AddPropertyFormProps {
   onSuccess: () => void;
+  currentUser: any; // TODO: Replace with proper User type
 }
 
-const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
+const FormularioImovel = (props: AddPropertyFormProps) => {
+  const { onSuccess, currentUser } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [proprietarios, setProprietarios] = useState<Proprietario[]>([]);
   const [isLoadingProprietarios, setIsLoadingProprietarios] = useState(true);
   const [gestores, setGestores] = useState<Gestor[]>([]);
   const [isLoadingGestores, setIsLoadingGestores] = useState(true);
+  const [isManager, setIsManager] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (props.currentUser) {
+      setIsManager(props.currentUser.userType === 'GESTOR');
+      setIsAdmin(props.currentUser.userType === 'ADMIN');
+    }
+  }, [props.currentUser]);
 
   useEffect(() => {
     const carregarDados = async () => {
@@ -63,8 +75,16 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
       setIsLoadingGestores(true);
       
       try {
-        // Carregar proprietários
-        const proprietariosData = await listarProprietarios();
+        // Carregar proprietários com filtro baseado no tipo de usuário
+        let proprietariosData = await listarProprietarios();
+        
+        if (isManager && currentUser) {
+          // Managers can only see owners they manage
+          // We'll implement proper filtering once API supports it
+          // For now, show all owners
+          toast.info('Filtragem de proprietários por gestor ainda não implementada');
+        }
+        
         setProprietarios(proprietariosData);
       } catch (error) {
         toast.error('Erro ao carregar proprietários');
@@ -74,9 +94,13 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
       }
       
       try {
-        // Carregar gestores
-        const gestoresData = await listarGestores();
-        setGestores(gestoresData);
+        // Carregar gestores apenas para administradores
+        if (isAdmin) {
+          const gestoresData = await listarGestores();
+          setGestores(gestoresData);
+        } else {
+          setGestores([]);
+        }
       } catch (error) {
         toast.error('Erro ao carregar gestores');
         console.error('Erro ao carregar gestores:', error);
@@ -86,7 +110,7 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
     };
 
     carregarDados();
-  }, []);
+  }, [isManager, isAdmin, currentUser]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -465,4 +489,4 @@ const AddPropertyForm = ({ onSuccess }: AddPropertyFormProps) => {
   );
 };
 
-export default AddPropertyForm;
+export default FormularioImovel;

@@ -31,7 +31,7 @@ interface PropertyCardProps {
   className?: string;
 }
 
-const PropertyCard = ({
+const CardImovel = ({
   id,
   name,
   type,
@@ -129,4 +129,4 @@ const PropertyCard = ({
   );
 };
 
-export default PropertyCard;
+export default CardImovel;
