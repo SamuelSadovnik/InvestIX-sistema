@@ -1,9 +1,11 @@
 package com.invistaix.sistema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "PROPRIETARIOS")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Proprietario {
 
     @Id

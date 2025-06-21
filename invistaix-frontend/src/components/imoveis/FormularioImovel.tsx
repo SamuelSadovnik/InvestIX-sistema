@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User } from '@/contexts/AuthContext';
 import {
   Form,
   FormControl,
@@ -32,7 +31,13 @@ const formSchema = z.object({
   type: z.enum(['Casa', 'Apartamento', 'Comercial', 'Terreno'], {
     required_error: 'Selecione um tipo de imóvel',
   }),
-  address: z.string().min(5, 'Endereço deve ter pelo menos 5 caracteres'),
+  rua: z.string().min(2, 'Rua é obrigatória'),
+  numero: z.string().min(1, 'Número é obrigatório'),
+  complemento: z.string().optional(),
+  bairro: z.string().min(2, 'Bairro é obrigatório'),
+  cidade: z.string().min(2, 'Cidade é obrigatória'),
+  estado: z.string().min(2, 'Estado é obrigatório'),
+  cep: z.string().min(8, 'CEP é obrigatório'),
   matriculaValue: z.number().min(1, 'Valor da matrícula deve ser maior que 0'),
   matriculaDate: z.string().min(1, 'Data da matrícula é obrigatória'),
   rentValue: z.number().optional(),
@@ -43,6 +48,9 @@ const formSchema = z.object({
   area: z.number().optional(),
   owner: z.string().min(1, 'Proprietário é obrigatório'),
   manager: z.string().min(1, 'Gestor é obrigatório'),
+  foto: z.any().refine(file => file instanceof File && file.size > 0, {
+    message: "A foto do imóvel é obrigatória",
+  }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -79,9 +87,9 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
         let proprietariosData = await listarProprietarios();
         
         if (isManager && currentUser) {
-          // Managers can only see owners they manage
-          // We'll implement proper filtering once API supports it
-          // For now, show all owners
+          // Filter owners managed by current manager
+          // Temporary solution until API supports filtering
+          // For now, show all owners with a toast notification
           toast.info('Filtragem de proprietários por gestor ainda não implementada');
         }
         
@@ -99,7 +107,19 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
           const gestoresData = await listarGestores();
           setGestores(gestoresData);
         } else {
-          setGestores([]);
+          // For managers, set themselves as the only option
+          if (isManager && currentUser) {
+            setGestores([{
+              id: currentUser.id,
+              nome: currentUser.name,
+              cpf: currentUser.cpf,
+              email: currentUser.email,
+              telefone: currentUser.telefone || '',
+              senha: ''
+            }]);
+          } else {
+            setGestores([]);
+          }
         }
       } catch (error) {
         toast.error('Erro ao carregar gestores');
@@ -116,7 +136,13 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      address: '',
+      rua: '',
+      numero: '',
+      complemento: '',
+      bairro: '',
+      cidade: '',
+      estado: '',
+      cep: '',
       matriculaValue: 0,
       matriculaDate: '',
       rentValue: 0,
@@ -127,41 +153,72 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
       area: 0,
       owner: '',
       manager: '',
+      foto: null,
     },
   });
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // Simular criação do imóvel
-      const newProperty: Property = {
-        id: Date.now().toString(),
-        name: data.name,
-        type: data.type,
-        address: data.address,
-        matriculaValue: data.matriculaValue,
-        matriculaDate: data.matriculaDate,
-        rentValue: data.rentValue,
-        saleValue: data.saleValue,
-        taxValue: data.taxValue,
-        rooms: data.rooms,
-        bathrooms: data.bathrooms,
+      // Map property type to backend values
+      const tipoMap: Record<string, string> = {
+        'Casa': 'CASA',
+        'Apartamento': 'APARTAMENTO',
+        'Comercial': 'COMERCIAL',
+        'Terreno': 'TERRENO'
+      };
+      
+      const backendData = {
+        nomeImovel: data.name,
+        tipoImovel: tipoMap[data.type] || data.type,
+        endereco: {
+          rua: data.rua,
+          numero: data.numero,
+          complemento: data.complemento || '',
+          bairro: data.bairro,
+          cidade: data.cidade,
+          estado: data.estado,
+          cep: data.cep
+        },
+        valorMatricula: data.matriculaValue,
+        dataRegistroMatricula: data.matriculaDate,
+        valorAluguelAtual: data.rentValue,
+        valorVendaEstimado: data.saleValue,
+        valorIptu: data.taxValue,
+        numQuartos: data.rooms,
         area: data.area,
-        owner: data.owner,
-        manager: data.manager,
-        performance: {
-          percentage: 0,
-          isPositive: true
+        proprietario: {
+          id: parseInt(data.owner)
+        },
+        gestor: {
+          id: parseInt(data.manager)
         }
       };
 
-      console.log('Novo imóvel criado:', newProperty);
+      // Enviar dados para o backend
+      const formData = new FormData();
+      formData.append('imovel', JSON.stringify(backendData));
+      formData.append('foto', data.foto);
+
+      const response = await fetch('/api/imoveis', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorResponse}`);
+      }
+
       toast.success('Imóvel cadastrado com sucesso!');
       form.reset();
       onSuccess();
-    } catch (error) {
-      toast.error('Erro ao cadastrar imóvel');
-      console.error('Erro:', error);
+    } catch (error: any) {
+      toast.error(`Erro ao cadastrar imóvel: ${error.message}`);
+      console.error('Erro detalhado:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -217,12 +274,96 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
 
               <FormField
                 control={form.control}
-                name="address"
+                name="rua"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>Endereço</FormLabel>
+                  <FormItem>
+                    <FormLabel>Rua</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Av. Paulista, 1000, São Paulo - SP" {...field} />
+                      <Input placeholder="Ex: Av. Paulista" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="numero"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: 1000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="complemento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Complemento</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Apt 101" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="bairro"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bairro</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Bela Vista" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="cidade"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cidade</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: São Paulo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="estado"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estado</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: SP" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="cep"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CEP</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: 01310-100" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -364,11 +505,29 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                   <FormItem>
                     <FormLabel>Área (m²)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="75" 
+                      <Input
+                        type="number"
+                        placeholder="75"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="foto"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Foto do Imóvel (Obrigatória)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => field.onChange(e.target.files?.[0])}
                       />
                     </FormControl>
                     <FormMessage />
@@ -436,46 +595,56 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
             <CardDescription>Selecione o gestor deste imóvel</CardDescription>
           </CardHeader>
           <CardContent>
-            <FormField
-              control={form.control}
-              name="manager"
-              render={({ field }) => (
-                <FormItem>
-                  {isLoadingGestores ? (
-                    <div className="text-sm text-muted-foreground">Carregando gestores...</div>
-                  ) : gestores.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">Nenhum gestor encontrado</div>
-                  ) : (
-                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                      {gestores.map((gestor) => (
-                        <FormItem
-                          key={gestor.id}
-                          className="flex flex-row items-start space-x-3 space-y-0 mb-3"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value === gestor.id.toString()}
-                              onCheckedChange={() => {
-                                field.onChange(gestor.id.toString());
-                              }}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-medium">
-                              {gestor.nome}
-                            </FormLabel>
-                            <p className="text-xs text-muted-foreground">
-                              {gestor.cpf} - {gestor.email}
-                            </p>
-                          </div>
-                        </FormItem>
-                      ))}
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {isManager ? (
+              <div className="p-3 border rounded-md bg-muted/50">
+                <p className="text-sm font-medium">{currentUser.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  Você é o gestor responsável por este imóvel
+                </p>
+                <input type="hidden" {...form.register('manager')} value={currentUser.id} />
+              </div>
+            ) : (
+              <FormField
+                control={form.control}
+                name="manager"
+                render={({ field }) => (
+                  <FormItem>
+                    {isLoadingGestores ? (
+                      <div className="text-sm text-muted-foreground">Carregando gestores...</div>
+                    ) : gestores.length === 0 ? (
+                      <div className="text-sm text-muted-foreground">Nenhum gestor encontrado</div>
+                    ) : (
+                      <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                        {gestores.map((gestor) => (
+                          <FormItem
+                            key={gestor.id}
+                            className="flex flex-row items-start space-x-3 space-y-0 mb-3"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value === gestor.id.toString()}
+                                onCheckedChange={() => {
+                                  field.onChange(gestor.id.toString());
+                                }}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel className="text-sm font-medium">
+                                {gestor.nome}
+                              </FormLabel>
+                              <p className="text-xs text-muted-foreground">
+                                {gestor.cpf} - {gestor.email}
+                              </p>
+                            </div>
+                          </FormItem>
+                        ))}
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
         </Card>
 

@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { properties } from '@/data/mockData';
+import useImoveis from '@/hooks/useImoveis';
 import CardImovel from '@/components/imoveis/CardImovel';
 import FormularioImovel from '@/components/imoveis/FormularioImovel';
 import { 
@@ -35,10 +35,13 @@ const Imoveis = () => {
   const [propertyType, setPropertyType] = useState<string | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const filteredProperties = properties.filter(property => {
-    const matchesSearch = property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !propertyType || property.type === propertyType;
+  const { imoveis, loading, error } = useImoveis();
+
+  const filteredProperties = imoveis.filter(property => {
+    const propertyAddress = `${property.endereco.rua}, ${property.endereco.numero} - ${property.endereco.bairro}`;
+    const matchesSearch = property.nomeImovel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         propertyAddress.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = !propertyType || property.tipoImovel === propertyType;
     
     return matchesSearch && matchesType;
   });
@@ -109,21 +112,27 @@ const Imoveis = () => {
       </div>
       
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredProperties.length > 0 ? (
+        {loading ? (
+          <div className="col-span-full flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center py-12 text-destructive">
+            {error}
+          </div>
+        ) : filteredProperties.length > 0 ? (
           filteredProperties.map((property) => (
             <CardImovel
-              key={property.id}
-              id={property.id}
-              name={property.name}
-              type={property.type}
-              address={property.address}
-              rentValue={property.rentValue}
-              saleValue={property.saleValue}
-              rooms={property.rooms}
-              bathrooms={property.bathrooms}
-              area={property.area}
-              imageUrl={property.imageUrl}
-              performance={property.performance}
+              key={property.id.toString()}
+              id={property.id.toString()}
+              name={property.nomeImovel}
+              type={property.tipoImovel}
+              address={`${property.endereco.rua}, ${property.endereco.numero} - ${property.endereco.bairro}`}
+              rentValue={property.valorAluguelAtual}
+              saleValue={property.valorVendaEstimado}
+              rooms={property.numQuartos}
+              bathrooms={0} // Placeholder until backend adds bathrooms
+              area={property.area || 0}
             />
           ))
         ) : (

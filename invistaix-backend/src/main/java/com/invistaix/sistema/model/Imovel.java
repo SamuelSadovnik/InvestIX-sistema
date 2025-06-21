@@ -1,5 +1,6 @@
 package com.invistaix.sistema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,6 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "IMOVEIS")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Imovel {
 
     @Id
@@ -20,7 +22,7 @@ public class Imovel {
     @Column(name = "tipo_imovel", nullable = false, length = 50)
     private String tipoImovel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id", nullable = false)
     private Endereco endereco;
 
