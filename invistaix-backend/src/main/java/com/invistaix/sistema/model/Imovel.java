@@ -1,6 +1,7 @@
 package com.invistaix.sistema.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.invistaix.sistema.enums.TipoImovel;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,8 +20,9 @@ public class Imovel {
     @Column(name = "nome_imovel", nullable = false, length = 100)
     private String nomeImovel;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_imovel", nullable = false, length = 50)
-    private String tipoImovel;
+    private TipoImovel tipoImovel;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id", nullable = false)
@@ -58,8 +60,7 @@ public class Imovel {
     @Column(name = "numero_apartamentos")
     private Integer numeroApartamentos;
 
-    @Lob
-    @Column(name = "foto_imovel")
+    @Column(name = "foto_imovel", columnDefinition = "bytea")
     private byte[] fotoImovel;
 
     @ManyToMany
@@ -90,7 +91,7 @@ public class Imovel {
     public Imovel() {
     }
 
-    public Imovel(Integer id, String nomeImovel, String tipoImovel, Endereco endereco, Proprietario proprietario,
+    public Imovel(Integer id, String nomeImovel, TipoImovel tipoImovel, Endereco endereco, Proprietario proprietario,
                   Gestor gestor, BigDecimal valorMatricula, LocalDate dataRegistroMatricula,
                   BigDecimal valorAluguelAtual, BigDecimal valorVendaEstimado, BigDecimal valorIptu,
                   BigDecimal area, Integer numQuartos, Integer numeroApartamentos) {
@@ -127,11 +128,11 @@ public class Imovel {
         this.nomeImovel = nomeImovel;
     }
 
-    public String getTipoImovel() {
+    public TipoImovel getTipoImovel() {
         return tipoImovel;
     }
 
-    public void setTipoImovel(String tipoImovel) {
+    public void setTipoImovel(TipoImovel tipoImovel) {
         this.tipoImovel = tipoImovel;
     }
 

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -33,9 +34,29 @@ public class JwtUtil {
 
     public String generateToken(AuthenticatedUser user) {
         Map<String, Object> claims = new HashMap<>();
+        // Use correct role format for Spring Security
+        // claims.put("authorities", "ROLE_ADMINISTRADOR");
         claims.put("userType", user.getUserType().name());
         claims.put("username", user.getNome());
         claims.put("userId", user.getId());
+        
+        // Map user types to Spring Security compatible roles
+        String role;
+        UserType userType = user.getUserType();
+        switch (userType) {
+            case ADMIN:
+                role = "ROLE_ADMINISTRADOR";
+                break;
+            case GESTOR:
+                role = "ROLE_GESTOR";
+                break;
+            case PROPRIETARIO:
+                role = "ROLE_PROPRIETARIO";
+                break;
+            default:
+                role = "ROLE_USER";
+        }
+        claims.put("authorities", List.of(role));
 
         return Jwts.builder()
             .claims(claims)

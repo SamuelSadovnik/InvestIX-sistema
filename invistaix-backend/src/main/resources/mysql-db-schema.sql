@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS IMOVEIS (
     valor_venda_estimado DECIMAL(10, 2), -- Valor estimado de venda
     valor_iptu DECIMAL(10, 2), -- Valor atual do IPTU
     -- Opcional
-    foto_imovel MEDIUMBLOB, -- Dados binários da foto do imóvel
+    foto_imovel BYTEA, -- Dados binários da foto do imóvel
     area DECIMAL(10, 2), -- Característica opcional: área
     num_quartos INT, -- Característica opcional: número de quartos
     numero_apartamentos INT, -- Opcional, para prédios

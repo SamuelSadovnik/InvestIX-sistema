@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Home, 
-  Plus, 
+import {
+  Home,
+  Plus,
   Search,
   Filter,
   MapPin
@@ -19,20 +19,21 @@ import {
 import useImoveis from '@/hooks/useImoveis';
 import CardImovel from '@/components/imoveis/CardImovel';
 import FormularioImovel from '@/components/imoveis/FormularioImovel';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { TipoImovel, getTipoDisplay, propertyTypes } from '@/utils/imovelUtils';
 
 const Imoveis = () => {
   const { user, userType } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [propertyType, setPropertyType] = useState<string | undefined>(undefined);
+  const [propertyType, setPropertyType] = useState<TipoImovel | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const { imoveis, loading, error } = useImoveis();
@@ -51,7 +52,7 @@ const Imoveis = () => {
   };
 
   const handleTypeChange = (value: string) => {
-    setPropertyType(value === 'all' ? undefined : value);
+    setPropertyType(value === 'all' ? undefined : value as TipoImovel);
   };
 
   return (
@@ -99,10 +100,11 @@ const Imoveis = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
-              <SelectItem value="Apartamento">Apartamento</SelectItem>
-              <SelectItem value="Casa">Casa</SelectItem>
-              <SelectItem value="Comercial">Comercial</SelectItem>
-              <SelectItem value="Terreno">Terreno</SelectItem>
+              {propertyTypes.map(type => (
+                <SelectItem key={type} value={type}>
+                  {getTipoDisplay(type)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button variant="outline" size="icon">
@@ -131,8 +133,11 @@ const Imoveis = () => {
               rentValue={property.valorAluguelAtual}
               saleValue={property.valorVendaEstimado}
               rooms={property.numQuartos}
-              bathrooms={0} // Placeholder until backend adds bathrooms
+              bathrooms={0}
               area={property.area || 0}
+              imageUrl={property.fotoImovel
+                ? `data:image/jpeg;base64,${property.fotoImovel}`
+                : undefined}
             />
           ))
         ) : (

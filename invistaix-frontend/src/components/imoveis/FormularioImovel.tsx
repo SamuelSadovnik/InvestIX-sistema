@@ -25,10 +25,11 @@ import { toast } from 'sonner';
 import { Property } from '@/data/mockData';
 import { listarProprietarios, Proprietario } from '@/hooks/useProprietario';
 import { listarGestores, Gestor } from '@/hooks/useGestor';
+import { TipoImovel, propertyTypes, getTipoDisplay } from '@/utils/imovelUtils';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  type: z.enum(['Casa', 'Apartamento', 'Comercial', 'Terreno'], {
+  type: z.enum(propertyTypes as [string, ...string[]], {
     required_error: 'Selecione um tipo de imóvel',
   }),
   rua: z.string().min(2, 'Rua é obrigatória'),
@@ -161,16 +162,9 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
     setIsSubmitting(true);
     try {
       // Map property type to backend values
-      const tipoMap: Record<string, string> = {
-        'Casa': 'CASA',
-        'Apartamento': 'APARTAMENTO',
-        'Comercial': 'COMERCIAL',
-        'Terreno': 'TERRENO'
-      };
-      
       const backendData = {
         nomeImovel: data.name,
-        tipoImovel: tipoMap[data.type] || data.type,
+        tipoImovel: data.type,
         endereco: {
           rua: data.rua,
           numero: data.numero,
@@ -197,7 +191,9 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
 
       // Enviar dados para o backend
       const formData = new FormData();
-      formData.append('imovel', JSON.stringify(backendData));
+      formData.append('imovel', new Blob([JSON.stringify(backendData)], {
+        type: 'application/json'
+      }));
       formData.append('foto', data.foto);
 
       const response = await fetch('/api/imoveis', {
@@ -233,307 +229,356 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
             <CardDescription>Dados básicos do imóvel</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome do Imóvel</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Apartamento Centro" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="space-y-4">
+              {/* Linha 1: Nome do Imóvel (3/4) e Tipo (1/4) */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-3">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome do Imóvel</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Apartamento Centro" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {propertyTypes.map((tipo) => (
+                              <SelectItem key={tipo} value={tipo}>
+                                {getTipoDisplay(tipo)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+              {/* Linha 2: Rua (3/4) e Número (1/4) */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-3">
+                  <FormField
+                    control={form.control}
+                    name="rua"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rua</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Av. Paulista" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <FormField
+                    control={form.control}
+                    name="numero"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: 1000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Linha 3: Complemento (1/2) e Bairro (1/2) */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="complemento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Complemento</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
+                        <Input placeholder="Ex: Apt 101" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Casa">Casa</SelectItem>
-                        <SelectItem value="Apartamento">Apartamento</SelectItem>
-                        <SelectItem value="Comercial">Comercial</SelectItem>
-                        <SelectItem value="Terreno">Terreno</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bairro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bairro</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Bela Vista" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="rua"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rua</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Av. Paulista" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Linha 4: Cidade (2/4), Estado (1/8), CEP (1/4) */}
+              <div className="grid grid-cols-8 gap-4">
+                <div className="col-span-4">
+                  <FormField
+                    control={form.control}
+                    name="cidade"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cidade</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: São Paulo" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <FormField
+                    control={form.control}
+                    name="estado"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado</FormLabel>
+                        <FormControl>
+                          <Input placeholder="SP" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="col-span-3">
+                  <FormField
+                    control={form.control}
+                    name="cep"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CEP</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: 01310-100" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="numero"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: 1000" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Linha 5: Valor da Matrícula (3/4) e Data da Matrícula (1/4) */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-3">
+                  <FormField
+                    control={form.control}
+                    name="matriculaValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Valor da Matrícula</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
+                            <Input
+                              type="number"
+                              placeholder="350.000"
+                              className="pl-8"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <FormField
+                    control={form.control}
+                    name="matriculaDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Data da Matrícula</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="complemento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Complemento</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Apt 101" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Linha 6: Aluguel, Venda e Imposto em colunas iguais */}
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rentValue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Aluguel (R$)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
+                          <Input
+                            type="number"
+                            placeholder="2500"
+                            className="pl-8"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="saleValue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Venda (R$)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
+                          <Input
+                            type="number"
+                            placeholder="420000"
+                            className="pl-8"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="taxValue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Imposto (R$)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
+                          <Input
+                            type="number"
+                            placeholder="2100"
+                            className="pl-8"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="bairro"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bairro</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Bela Vista" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Linha 7: Quartos, Banheiros e Área na mesma linha */}
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rooms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quartos</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="2" 
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bathrooms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Banheiros</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="2" 
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="area"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Área (m²)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="75"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="cidade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cidade</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: São Paulo" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="estado"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estado</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: SP" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="cep"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CEP</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: 01310-100" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="matriculaValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor da Matrícula (R$)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="350000" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="matriculaDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data da Matrícula</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="rentValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor do Aluguel (R$)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="2500" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="saleValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor de Venda (R$)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="420000" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="taxValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor do Imposto (R$)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="2100" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="rooms"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quartos</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="2" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="bathrooms"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Banheiros</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="2" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="area"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Área (m²)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="75"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="foto"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Foto do Imóvel (Obrigatória)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => field.onChange(e.target.files?.[0])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Linha 8: Foto do imóvel (largura total) */}
+              <div className="w-full">
+                <FormField
+                  control={form.control}
+                  name="foto"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Foto do Imóvel (Obrigatória)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => field.onChange(e.target.files?.[0])}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -559,7 +604,7 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       {proprietarios.map((proprietario) => (
                         <FormItem
                           key={proprietario.id}
-                          className="flex flex-row items-start space-x-3 space-y-0 mb-3"
+                          className="flex flex-row items-center space-x-3 space-y-0 mb-3"
                         >
                           <FormControl>
                             <Checkbox
@@ -569,8 +614,8 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                               }}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-medium">
+                          <div className="grid gap-1.5 leading-none">
+                            <FormLabel className="text-sm font-medium cursor-pointer">
                               {proprietario.nome}
                             </FormLabel>
                             <p className="text-xs text-muted-foreground">
@@ -618,7 +663,7 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                         {gestores.map((gestor) => (
                           <FormItem
                             key={gestor.id}
-                            className="flex flex-row items-start space-x-3 space-y-0 mb-3"
+                            className="flex flex-row items-center space-x-3 space-y-0 mb-3"
                           >
                             <FormControl>
                               <Checkbox
@@ -628,7 +673,7 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                                 }}
                               />
                             </FormControl>
-                            <div className="space-y-1 leading-none">
+                            <div className="grid gap-1.5 leading-none">
                               <FormLabel className="text-sm font-medium">
                                 {gestor.nome}
                               </FormLabel>

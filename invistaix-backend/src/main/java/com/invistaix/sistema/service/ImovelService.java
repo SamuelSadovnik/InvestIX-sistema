@@ -4,31 +4,37 @@ import com.invistaix.sistema.model.Imovel;
 import com.invistaix.sistema.repository.ImovelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ImovelService {
 
     @Autowired
     private ImovelRepository imovelRepository;
 
     // Listar todos os imóveis
+    @Transactional(readOnly = true)
     public List<Imovel> findAll() {
         return imovelRepository.findAll();
     }
     
+    @Transactional(readOnly = true)
     public List<Imovel> findByGestorId(Integer gestorId) {
         return imovelRepository.findByGestorId(gestorId);
     }
     
+    @Transactional(readOnly = true)
     public List<Imovel> findByProprietarioId(Integer proprietarioId) {
         return imovelRepository.findByProprietarioId(proprietarioId);
     }
 
     // Buscar um imóvel por ID
+    @Transactional(readOnly = true)
     public Imovel findById(Integer id) {
         Optional<Imovel> imovel = imovelRepository.findById(id);
         if (imovel.isEmpty()) {
