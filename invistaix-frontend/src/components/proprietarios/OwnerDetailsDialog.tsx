@@ -20,8 +20,8 @@ import { properties } from '@/data/mockData';
 interface Owner {
   id: string;
   nome: string;
-  type: 'PF' | 'PJ';
-  cpfCnpj: string;
+  tipoDocumento: 'CPF' | 'CNPJ';
+  documento: string;
   email: string;
   telefone: string;
 }
@@ -66,7 +66,7 @@ export const OwnerDetailsDialog: React.FC<OwnerDetailsDialogProps> = ({
               <div className="flex items-center text-sm">
                 <UserCheck className="h-4 w-4 mr-3 text-muted-foreground" />
                 <span className="font-medium mr-2">Documento:</span>
-                <span>{owner.cpfCnpj}</span>
+                <span>{owner.tipoDocumento}</span>
               </div>
               <div className="flex items-center text-sm">
                 <Mail className="h-4 w-4 mr-3 text-muted-foreground" />

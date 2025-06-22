@@ -6,6 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { criarProprietario } from '@/hooks/useProprietario';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Form,
   FormControl,
   FormDescription,
@@ -19,7 +26,10 @@ import { toast } from 'sonner';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
+  tipoDocumento: z.enum(['CPF', 'CNPJ'], {
+    required_error: 'Selecione o tipo de pessoa',
+  }),
+  documento: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   senha: z.string().min(6,  "Senha deve ter pelo menos 6 caracteres." ),
@@ -35,7 +45,8 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       nome: '',
-      cpfCnpj: '',
+      tipoDocumento: undefined,
+      documento: '',
       email: '',
       telefone: '',
       senha: '',
@@ -68,6 +79,28 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 form-grid">
               <FormField
                 control={form.control}
+                name="tipoDocumento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="CPF">Pessoa Física</SelectItem>
+                        <SelectItem value="CNPJ">Pessoa Jurídica</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
                 name="nome"
                 render={({ field }) => (
                   <FormItem className="form-field-container sm:col-span-2">
@@ -81,7 +114,7 @@ const AddOwnerForm = ({ onSuccess }: AddOwnerFormProps) => {
               />
               <FormField
                 control={form.control}
-                name="cpfCnpj"
+                name="documento"
                 render={({ field }) => (
                   <FormItem className="form-field-container">
                     <FormLabel className="text-sm">CPF/CNPJ</FormLabel>

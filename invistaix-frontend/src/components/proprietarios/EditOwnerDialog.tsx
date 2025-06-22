@@ -25,7 +25,10 @@ import { toast } from 'sonner';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  cpfCnpj: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
+  tipoDocumento: z.enum(['PF', 'PJ'], {
+    required_error: 'Selecione o tipo de pessoa',
+  }),
+  documento: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
   email: z.string().email('Email inválido'),
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   senha: z.string().min(6,  "Senha deve ter pelo menos 6 caracteres." ),
@@ -54,7 +57,8 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       nome: owner.nome,
-      cpfCnpj: owner.cpfCnpj,
+      tipoDocumento: owner.tipoDocumento,
+      documento: owner.documento,
       email: owner.email,
       telefone: owner.telefone,
       senha: owner.senha,
@@ -80,6 +84,28 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 form-grid">
               <FormField
                 control={form.control}
+                name="tipoDocumento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="PF">Pessoa Física</SelectItem>
+                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="nome"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
@@ -94,7 +120,7 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
 
               <FormField
                 control={form.control}
-                name="cpfCnpj"
+                name="documento"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>CPF/CNPJ</FormLabel>

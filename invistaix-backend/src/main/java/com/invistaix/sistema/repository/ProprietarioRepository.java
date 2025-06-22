@@ -29,4 +29,7 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Inte
            "JOIN Imovel i ON i.proprietario.id = p.id " +
            "WHERE i.gestor.id = :gestorId")
     List<Proprietario> findByGestorId(@Param("gestorId") Integer gestorId);
+
+    @Query("SELECT DISTINCT i.proprietario FROM Imovel i WHERE i.gestor.id = :gestorId")
+    List<Proprietario> findProprietariosByGestorId(@Param("gestorId") Integer gestorId);
 }

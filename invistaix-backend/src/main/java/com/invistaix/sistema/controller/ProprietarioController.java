@@ -32,6 +32,17 @@ public class ProprietarioController {
         return ResponseEntity.ok(savedProprietario);
     }
 
+    @GetMapping("/gestor")
+    public ResponseEntity<List<Proprietario>> listarProprietariosDoGestor(Authentication authentication) {
+        AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
+        Integer gestorId = user.getId();
+
+        List<Proprietario> proprietarios = proprietarioService.listarPorGestor(gestorId);
+
+        return ResponseEntity.ok(proprietarios);
+    }
+
+
     // Listar todos os proprietários (admin) ou proprietários associados ao gestor
     @GetMapping
     public ResponseEntity<List<Proprietario>> getAllProprietarios(Authentication authentication) {

@@ -57,6 +57,10 @@ public class ProprietarioService {
         return proprietarioRepository.save(proprietario);
     }
 
+    public List<Proprietario> listarPorGestor(Integer gestorId) {
+    return proprietarioRepository.findProprietariosByGestorId(gestorId);
+    }
+
     // Listar todos os proprietários (admin) ou proprietários associados ao gestor
     public List<Proprietario> findAll(Integer gestorId) {
         if (gestorId != null) {

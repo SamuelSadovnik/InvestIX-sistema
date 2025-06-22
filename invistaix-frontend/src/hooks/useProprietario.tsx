@@ -3,9 +3,10 @@ const API_URL = 'http://localhost:8080/api';
 export interface Proprietario {
   id: number;
   nome: string;
+  tipoDocumento: string;
   email: string;
   telefone: string;
-  cpfCnpj: string;
+  documento: string;
   senha: string;
   quantidadeImoveis?: number;
 }
@@ -17,6 +18,25 @@ function getAuthHeaders(): HeadersInit {
     ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 }
+
+export const listarProprietariosPorGestor = async (): Promise<Proprietario[]> => {
+  try {
+    const response = await fetch(`${API_URL}/proprietarios/gestor`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data as Proprietario[];
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
 
 export const listarProprietarios = async (): Promise<Proprietario[]> => {
   try {
