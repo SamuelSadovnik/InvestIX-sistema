@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Plus, Search, Filter } from 'lucide-react';
+import { Home, Plus, Search, Filter, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,9 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import useImoveis from '@/hooks/useImoveis';
+import useImoveis, { deletarImovel, Imovel } from '@/hooks/useImoveis';
 import CardImovel from '@/components/imoveis/CardImovel';
 import FormularioImovel from '@/components/imoveis/FormularioImovel';
+import DeleteImovelDialog from '@/components/imoveis/DeleteImovelDialog';
+
 import {
   Dialog,
   DialogContent,
@@ -20,20 +22,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { TipoImovel, getTipoDisplay, propertyTypes } from '@/utils/imovelUtils';
+import { toast } from 'sonner';
 
 const Imoveis = () => {
   const { user, userType } = useAuth();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [propertyType, setPropertyType] = useState<TipoImovel | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedImovel, setSelectedImovel] = useState<Imovel | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [imovelToDelete, setImovelToDelete] = useState<Imovel | null>(null);
 
-  const { imoveis, loading, error, reload } = useImoveis(); // ✅ Pega o reload do hook
+  const { imoveis, loading, error, reload } = useImoveis();
 
-  const filteredProperties = imoveis.filter(property => {
+  const filteredProperties = imoveis.filter((property) => {
     const propertyAddress = `${property.endereco.rua}, ${property.endereco.numero} - ${property.endereco.bairro}`;
-    const matchesSearch = property.nomeImovel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      property.nomeImovel.toLowerCase().includes(searchTerm.toLowerCase()) ||
       propertyAddress.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = !propertyType || property.tipoImovel === propertyType;
 
@@ -42,11 +51,26 @@ const Imoveis = () => {
 
   const handleFormSuccess = () => {
     setIsDialogOpen(false);
-    reload(); // ✅ Recarrega imóveis após cadastrar
+    setSelectedImovel(null);
+    reload();
   };
 
   const handleTypeChange = (value: string) => {
-    setPropertyType(value === 'all' ? undefined : value as TipoImovel);
+    setPropertyType(value === 'all' ? undefined : (value as TipoImovel));
+  };
+
+  const handleDelete = async () => {
+    if (!imovelToDelete) return;
+    try {
+      await deletarImovel(imovelToDelete.id);
+      toast.success('Imóvel deletado com sucesso');
+      setIsDeleteOpen(false);
+      setImovelToDelete(null);
+      reload();
+    } catch (error) {
+      toast.error('Erro ao deletar imóvel');
+      console.error(error);
+    }
   };
 
   return (
@@ -57,7 +81,13 @@ const Imoveis = () => {
           <p className="text-muted-foreground">Gerencie sua carteira de imóveis</p>
         </div>
         {userType !== 'PROPRIETARIO' && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) setSelectedImovel(null);
+              setIsDialogOpen(open);
+            }}
+          >
             <DialogTrigger asChild>
               <Button className="invistaix-gradient">
                 <Plus className="h-4 w-4 mr-2" />
@@ -66,12 +96,20 @@ const Imoveis = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Cadastrar Novo Imóvel</DialogTitle>
+                <DialogTitle>
+                  {selectedImovel ? 'Editar Imóvel' : 'Cadastrar Novo Imóvel'}
+                </DialogTitle>
                 <DialogDescription>
-                  Preencha os detalhes do imóvel para adicioná-lo à sua carteira.
+                  {selectedImovel
+                    ? 'Altere os dados do imóvel.'
+                    : 'Preencha os detalhes do imóvel para adicioná-lo à sua carteira.'}
                 </DialogDescription>
               </DialogHeader>
-              <FormularioImovel onSuccess={handleFormSuccess} currentUser={user} />
+              <FormularioImovel
+                onSuccess={handleFormSuccess}
+                currentUser={user}
+                imovel={selectedImovel}
+              />
             </DialogContent>
           </Dialog>
         )}
@@ -94,7 +132,7 @@ const Imoveis = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
-              {propertyTypes.map(type => (
+              {propertyTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {getTipoDisplay(type)}
                 </SelectItem>
@@ -129,9 +167,37 @@ const Imoveis = () => {
               rooms={property.numQuartos}
               bathrooms={0}
               area={property.area || 0}
-              imageUrl={property.fotoImovel
-                ? `data:image/jpeg;base64,${property.fotoImovel}`
-                : undefined}
+              imageUrl={
+                property.fotoImovel
+                  ? `data:image/jpeg;base64,${property.fotoImovel}`
+                  : undefined
+              }
+              actions={
+                userType !== 'PROPRIETARIO' && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        setSelectedImovel(property);
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => {
+                        setImovelToDelete(property);
+                        setIsDeleteOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )
+              }
             />
           ))
         ) : (
@@ -144,6 +210,18 @@ const Imoveis = () => {
           </div>
         )}
       </div>
+
+      {imovelToDelete && (
+        <DeleteImovelDialog
+          isOpen={isDeleteOpen}
+          onClose={() => {
+            setIsDeleteOpen(false);
+            setImovelToDelete(null);
+          }}
+          onConfirm={handleDelete}
+          imovelName={imovelToDelete.nomeImovel}
+        />
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Home, MapPin, Bed, Bath, Square } from 'lucide-react';
+import { getTipoDisplay, TipoImovel } from "@/utils/imovelUtils";
+import { cn } from "@/lib/utils";
+import { Home, MapPin, Bed, Bath, Square } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,9 +8,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { TipoImovel, getTipoDisplay } from '@/utils/imovelUtils';
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+
 
 interface PropertyCardProps {
   id: string;
@@ -29,6 +29,7 @@ interface PropertyCardProps {
     isPositive: boolean;
   };
   className?: string;
+  actions?: React.ReactNode;
 }
 
 const CardImovel = ({
@@ -44,57 +45,49 @@ const CardImovel = ({
   imageUrl,
   performance,
   className,
+  actions, // <-- Recebe aqui
 }: PropertyCardProps) => {
   const displayType = getTipoDisplay(type);
   return (
-    <Link to={`/dashboard/imoveis/${id}`}>
-      <Card className={cn("overflow-hidden hover-scale", className)}>
-        <div className="relative h-48 w-full">
-          {imageUrl ? (
-            // Handle both URL and base64 images
-            <img
-              src={imageUrl.startsWith('data:image') ? imageUrl : imageUrl}
-              alt={name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.parentElement!.innerHTML = `
-                  <div class="w-full h-full bg-muted flex items-center justify-center">
-                    <Home class="h-12 w-12 text-muted-foreground/50" />
-                  </div>
-                `;
-              }}
-            />
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <Home className="h-12 w-12 text-muted-foreground/50" />
-            </div>
-          )}
-          <Badge
-            className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm text-foreground"
-          >
-            {displayType}
-          </Badge>
-        </div>
+    <div className={cn("overflow-hidden hover-scale", className)}>
+      <div className="relative h-48 w-full">
+        {imageUrl ? (
+          <img
+            src={imageUrl.startsWith('data:image') ? imageUrl : imageUrl}
+            alt={name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.parentElement!.innerHTML = `
+                <div class="w-full h-full bg-muted flex items-center justify-center">
+                  <svg class="h-12 w-12 text-muted-foreground/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6"/></svg>
+                </div>
+              `;
+            }}
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <Home className="h-12 w-12 text-muted-foreground/50" />
+          </div>
+        )}
+        <Badge
+          className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm text-foreground"
+        >
+          {displayType}
+        </Badge>
+      </div>
+      <Card className="flex flex-col justify-between h-full">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
-            <CardTitle className="text-lg">{name}</CardTitle>
-            {performance && (
-              <Badge 
-                variant={performance.isPositive ? "default" : "destructive"}
-                className={cn(
-                  "ml-auto",
-                  performance.isPositive ? "bg-green-500" : "bg-destructive"
-                )}
-              >
-                {performance.isPositive ? "+" : ""}{performance.percentage}%
-              </Badge>
-            )}
+            <div>
+              <CardTitle className="text-lg">{name}</CardTitle>
+              <CardDescription className="flex items-center text-xs">
+                <MapPin className="h-3 w-3 mr-1" />
+                {address}
+              </CardDescription>
+            </div>
+            {actions && <div className="flex gap-2">{actions}</div>}
           </div>
-          <CardDescription className="flex items-center text-xs">
-            <MapPin className="h-3 w-3 mr-1" />
-            {address}
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between text-sm">
@@ -133,7 +126,7 @@ const CardImovel = ({
           )}
         </CardFooter>
       </Card>
-    </Link>
+    </div>
   );
 };
 

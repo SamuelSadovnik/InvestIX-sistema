@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { TipoImovel } from '@/utils/imovelUtils';
 
-interface Imovel {
+export interface Imovel {
   id: number;
   nomeImovel: string;
   tipoImovel: TipoImovel;
@@ -20,6 +20,16 @@ interface Imovel {
   fotoImovel?: string;
 }
 
+const API_URL = '/api/imoveis';
+
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+}
+
 export default function useImoveis() {
   const { user } = useAuth();
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
@@ -31,20 +41,10 @@ export default function useImoveis() {
       setLoading(true);
       setError(null);
 
-      if (!user) {
-        throw new Error('Usuário não autenticado');
-      }
+      if (!user) throw new Error('Usuário não autenticado');
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token de autenticação não encontrado');
-      }
-
-      const response = await fetch('/api/imoveis', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await fetch(API_URL, {
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
@@ -62,12 +62,63 @@ export default function useImoveis() {
     }
   }, [user]);
 
-  // Carrega imóveis ao inicializar ou quando o user mudar
   useEffect(() => {
-    if (user) {
-      fetchImoveis();
-    }
+    if (user) fetchImoveis();
   }, [user, fetchImoveis]);
 
   return { imoveis, loading, error, reload: fetchImoveis };
 }
+
+export const criarImovel = async (imovelData): Promise<Imovel> => {
+  try {
+    const response = await fetch(`${API_URL}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(imovelData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
+
+export const deletarImovel = async (id: number): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
+
+export const atualizarImovel = async (id: number, dadosAtualizados: any): Promise<Imovel> => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(dadosAtualizados),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
