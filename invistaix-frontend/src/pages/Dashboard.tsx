@@ -36,6 +36,7 @@ import {
   expenseData, 
   resultData
 } from '@/data/mockData';
+import { useDashboard } from '@/contexts/DashboardContext';
 
 const API_RECEITAS = '/api/rendimentos';
 const API_DESPESAS = '/api/despesas';

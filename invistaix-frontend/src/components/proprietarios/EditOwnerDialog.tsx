@@ -7,6 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Proprietario } from '@/hooks/useProprietario';
 import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -25,7 +32,7 @@ import { toast } from 'sonner';
 
 const formSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  tipoDocumento: z.enum(['PF', 'PJ'], {
+  tipoDocumento: z.enum(['CPF', 'CNPJ'], {
     required_error: 'Selecione o tipo de pessoa',
   }),
   documento: z.string().min(11, 'Documento deve ter pelo menos 11 caracteres'),
@@ -95,8 +102,8 @@ export const EditOwnerDialog: React.FC<EditOwnerDialogProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="PF">Pessoa Física</SelectItem>
-                        <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
+                        <SelectItem value="CPF">Pessoa Física</SelectItem>
+                        <SelectItem value="CNPJ">Pessoa Jurídica</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

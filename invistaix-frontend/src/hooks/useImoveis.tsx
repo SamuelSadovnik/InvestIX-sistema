@@ -104,21 +104,42 @@ export const deletarImovel = async (id: number): Promise<void> => {
   }
 };
 
-export const atualizarImovel = async (id: number, dadosAtualizados: any): Promise<Imovel> => {
+export const atualizarImovel = async (
+  id: number,
+  dadosAtualizados: Imovel,
+  foto?: File
+): Promise<Imovel> => {
   try {
-    const response = await fetch(`${API_URL}/${id}`, {
+    const token = localStorage.getItem('token');
+
+    const formData = new FormData();
+    formData.append(
+      'imovel',
+      new Blob([JSON.stringify(dadosAtualizados)], { type: 'application/json' })
+    );
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    const response = await fetch(`/api/imoveis/${id}`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(dadosAtualizados),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // NUNCA adicionar 'Content-Type' manualmente aqui!
+      },
+      body: formData,
     });
 
     if (!response.ok) {
-      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+      const errorBody = await response.text();
+      throw new Error(`Erro ${response.status}: ${response.statusText} - ${errorBody}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Erro na requisição:', error);
+    console.error('Erro na atualização do imóvel:', error);
     throw error;
   }
 };
+

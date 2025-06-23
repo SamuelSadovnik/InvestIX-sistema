@@ -1,11 +1,14 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Home, MapPin, Calendar, DollarSign, TrendingUp, TrendingDown, Plus } from 'lucide-react';
+import { ArrowLeft, Home, MapPin, Calendar, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import PerformanceChart from '@/components/charts/PerformanceChart';
+import usePropertyDetails from '@/hooks/usePropertyDetails';
+import { useAuth } from '@/contexts/AuthContext';
+import AssessmentFormModal from '@/components/imoveis/AssessmentFormModal';
 
 const DetalhesImovel = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,18 +16,10 @@ const DetalhesImovel = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { user } = useAuth();
 
-  // Função para formatar o endereço
-  const formatAddress = (endereco) => {
-    if (typeof endereco === 'string') {
-      return endereco;
-    }
-    
-    if (typeof endereco === 'object' && endereco !== null) {
-      const { rua, numero, bairro, cidade, estado } = endereco;
-      return `${rua || ''} ${numero || ''}, ${bairro || ''}, ${cidade || ''} - ${estado || ''}`.trim();
-    }
-    
-    return 'Endereço não disponível';
+  const formatAddress = (endereco: any) => {
+    if (!endereco) return 'Endereço não disponível';
+    const { rua, numero, bairro, cidade, estado } = endereco;
+    return `${rua || ''} ${numero || ''}, ${bairro || ''}, ${cidade || ''} - ${estado || ''}`.trim();
   };
 
   if (loading) {
@@ -61,13 +56,11 @@ const DetalhesImovel = () => {
     );
   }
 
-  const { imovel, proprietarioNome, valorAtualizadoINCC, avaliacoes } = propertyDetails;
-  
-  // Calculate appreciation percentage
+  const { imovel, proprietarioNome, valorAtualizadoINCC } = propertyDetails;
+
   const appreciationPercentage = ((valorAtualizadoINCC - imovel.valorMatricula) / imovel.valorMatricula * 100).toFixed(2);
   const isPositive = parseFloat(appreciationPercentage) > 0;
-  
-  // Generate monthly performance data
+
   const monthlyPerformance = [
     { name: 'Jan', value: imovel.valorMatricula },
     { name: 'Fev', value: imovel.valorMatricula * 1.01 },
@@ -76,28 +69,16 @@ const DetalhesImovel = () => {
     { name: 'Mai', value: imovel.valorMatricula * 1.03 },
     { name: 'Jun', value: valorAtualizadoINCC },
   ];
-  
-  const handleAddAssessment = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleAssessmentAdded = () => {
-    refetch();
-  };
 
   return (
     <div className="space-y-6">
       <AssessmentFormModal
         propertyId={imovel.id}
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onAssessmentAdded={handleAssessmentAdded}
+        onClose={() => setIsModalOpen(false)}
+        onAssessmentAdded={() => refetch()}
       />
-      
+
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Link to="/dashboard/imoveis">
@@ -106,14 +87,15 @@ const DetalhesImovel = () => {
           </Button>
         </Link>
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">            <h1 className="text-2xl md:text-3xl font-bold">{imovel.nomeImovel}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold">{imovel.nomeImovel}</h1>
             <Badge variant="outline">{imovel.tipoImovel}</Badge>
             <Badge
               variant={isPositive ? "default" : "destructive"}
               className={isPositive ? "bg-green-500" : "bg-destructive"}
             >
               {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-              {isPositive ? "+" : ""}{appreciationPercentage}%
+              {isPositive ? '+' : ''}{appreciationPercentage}%
             </Badge>
           </div>
           <p className="text-muted-foreground flex items-center">
@@ -123,7 +105,7 @@ const DetalhesImovel = () => {
         </div>
       </div>
 
-      {/* Cards de métricas principais */}
+      {/* Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Valor da Matrícula"
@@ -131,7 +113,7 @@ const DetalhesImovel = () => {
           description={`Registrado em ${new Date(imovel.dataRegistroMatricula).toLocaleDateString()}`}
           icon={<Calendar className="h-4 w-4" />}
         />
-        
+
         {imovel.valorAluguelAtual && (
           <DashboardCard
             title="Aluguel Mensal"
@@ -140,7 +122,7 @@ const DetalhesImovel = () => {
             icon={<DollarSign className="h-4 w-4" />}
           />
         )}
-        
+
         {imovel.valorVendaEstimado && (
           <DashboardCard
             title="Valor de Venda"
@@ -149,14 +131,16 @@ const DetalhesImovel = () => {
             icon={<Home className="h-4 w-4" />}
           />
         )}
-        
+
         <DashboardCard
           title="Impostos Anuais"
           value={`R$ ${imovel.valorIptu.toLocaleString()}`}
           description="IPTU e taxas"
           icon={<DollarSign className="h-4 w-4" />}
         />
-      </div>      {/* Valorização do Imóvel - Expandido para tela cheia */}
+      </div>
+
+      {/* Gráfico de Valorização */}
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-xl">Valorização do Imóvel</CardTitle>
@@ -176,21 +160,25 @@ const DetalhesImovel = () => {
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-muted/30 p-3 rounded-lg">
               <p className="text-sm text-muted-foreground mb-1">Valorização Total</p>
-              <p className="text-lg font-semibold text-primary">{property.performance?.percentage || 5}%</p>
+              <p className="text-lg font-semibold text-primary">
+                {appreciationPercentage}%
+              </p>
             </div>
             <div className="bg-muted/30 p-3 rounded-lg">
               <p className="text-sm text-muted-foreground mb-1">Valor Inicial</p>
-              <p className="text-lg font-semibold">R$ {property.matriculaValue.toLocaleString()}</p>
+              <p className="text-lg font-semibold">R$ {imovel.valorMatricula.toLocaleString()}</p>
             </div>
             <div className="bg-muted/30 p-3 rounded-lg">
               <p className="text-sm text-muted-foreground mb-1">Valor Atual</p>
-              <p className="text-lg font-semibold">R$ {(property.saleValue || property.matriculaValue * 1.05).toLocaleString()}</p>
+              <p className="text-lg font-semibold">
+                R$ {valorAtualizadoINCC.toLocaleString()}
+              </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Características do imóvel - Redesenhado e expandido */}
+      {/* Características */}
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-xl">Características do Imóvel</CardTitle>
@@ -203,57 +191,43 @@ const DetalhesImovel = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tipo:</span>
-                  <span className="font-medium">{property.type}</span>
+                  <span className="font-medium">{imovel.tipoImovel}</span>
                 </div>
-                {property.area && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Área Total:</span>
-                    <span className="font-medium">{property.area}m²</span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Área Total:</span>
+                  <span className="font-medium">{imovel.area} m²</span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Endereço:</span>
-                  <span className="font-medium truncate max-w-[180px]">{property.address}</span>
+                  <span className="font-medium truncate max-w-[180px]">{formatAddress(imovel.endereco)}</span>
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-muted/20 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Especificações</h3>
               <div className="space-y-3">
-                {property.rooms && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Quartos:</span>
-                    <span className="font-medium">{property.rooms}</span>
-                  </div>
-                )}
-                {property.bathrooms && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Banheiros:</span>
-                    <span className="font-medium">{property.bathrooms}</span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Quartos:</span>
+                  <span className="font-medium">{imovel.numQuartos}</span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Matrícula:</span>
                   <span className="font-medium">{id?.slice(-6).toUpperCase() || 'N/A'}</span>
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-muted/20 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Responsáveis</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Proprietário:</span>
-                  <span className="font-medium">{property.owner}</span>
+                  <span className="font-medium">{proprietarioNome}</span>
                 </div>
-                {property.manager && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Gestor:</span>
-                    <span className="font-medium">{property.manager}</span>
-                  </div>                )}
               </div>
-            </div></div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -152,12 +152,20 @@ public class ImovelController {
         );
     }
 
-    // Atualizar um imóvel existente
-    @PutMapping("/{id}")
-    public ResponseEntity<Imovel> updateImovel(@PathVariable Integer id, @RequestBody Imovel imovel) {
-        Imovel updatedImovel = imovelService.update(id, imovel);
-        return ResponseEntity.ok(updatedImovel);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Imovel> updateImovel(
+        @PathVariable Integer id,
+        @RequestPart("imovel") Imovel imovel,
+        @RequestPart(value = "foto", required = false) MultipartFile foto) throws IOException {
+
+        if (foto != null && !foto.isEmpty()) {
+            imovel.setFotoImovel(foto.getBytes());
     }
+
+    Imovel updatedImovel = imovelService.update(id, imovel);
+    return ResponseEntity.ok(updatedImovel);
+}
+
 
     // Deletar um imóvel
     @DeleteMapping("/{id}")
