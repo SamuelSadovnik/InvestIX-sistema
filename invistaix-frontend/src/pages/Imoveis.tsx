@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Home,
-  Plus,
-  Search,
-  Filter,
-  MapPin
-} from 'lucide-react';
+import { Home, Plus, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,7 +18,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { TipoImovel, getTipoDisplay, propertyTypes } from '@/utils/imovelUtils';
@@ -35,20 +28,21 @@ const Imoveis = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [propertyType, setPropertyType] = useState<TipoImovel | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  const { imoveis, loading, error } = useImoveis();
+
+  const { imoveis, loading, error, reload } = useImoveis(); // ✅ Pega o reload do hook
 
   const filteredProperties = imoveis.filter(property => {
     const propertyAddress = `${property.endereco.rua}, ${property.endereco.numero} - ${property.endereco.bairro}`;
     const matchesSearch = property.nomeImovel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         propertyAddress.toLowerCase().includes(searchTerm.toLowerCase());
+      propertyAddress.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = !propertyType || property.tipoImovel === propertyType;
-    
+
     return matchesSearch && matchesType;
   });
 
   const handleFormSuccess = () => {
     setIsDialogOpen(false);
+    reload(); // ✅ Recarrega imóveis após cadastrar
   };
 
   const handleTypeChange = (value: string) => {
@@ -56,7 +50,7 @@ const Imoveis = () => {
   };
 
   return (
-    <div className="space-y-6">      
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Imóveis</h1>
@@ -112,7 +106,7 @@ const Imoveis = () => {
           </Button>
         </div>
       </div>
-      
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {loading ? (
           <div className="col-span-full flex justify-center py-12">
