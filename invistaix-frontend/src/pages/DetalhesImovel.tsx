@@ -117,9 +117,8 @@ const DetalhesImovel = () => {
           </Button>
         </Link>
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl md:text-3xl font-bold">{imovel.nomeImovel}</h1>
-            <Badge variant="outline">{imovel.t极oImovel}</Badge>
+          <div className="flex items-center gap-3 mb-2">            <h1 className="text-2xl md:text-3xl font-bold">{imovel.nomeImovel}</h1>
+            <Badge variant="outline">{imovel.tipoImovel}</Badge>
             <Badge
               variant={isPositive ? "default" : "destructive"}
               className={isPositive ? "bg-green-500" : "bg-destructive"}
