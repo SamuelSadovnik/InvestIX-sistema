@@ -1,5 +1,6 @@
 package com.invistaix.sistema.controller;
 
+import com.invistaix.sistema.dto.PropertyDetailsDTO;
 import com.invistaix.sistema.model.Imovel;
 import com.invistaix.sistema.service.ImovelService;
 import io.jsonwebtoken.Claims;
@@ -109,6 +110,46 @@ public class ImovelController {
     public ResponseEntity<Imovel> getImovelById(@PathVariable Integer id) {
         Imovel imovel = imovelService.findById(id);
         return ResponseEntity.ok(imovel);
+    }
+
+    // Buscar detalhes completos do imóvel por ID
+    @GetMapping("/properties/{id}")
+    public ResponseEntity<?> getPropertyDetails(@PathVariable Integer id, Authentication authentication) {
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
+        Integer userId = user.getId();
+        
+        // Admin can access any property
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            PropertyDetailsDTO propertyDetails = imovelService.getPropertyDetails(id);
+            return ResponseEntity.ok(propertyDetails);
+        }
+        
+        // Gestor can access properties they manage
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_GESTOR"))) {
+            List<Imovel> gestorProperties = imovelService.findByGestorId(userId);
+            boolean hasAccess = gestorProperties.stream().anyMatch(p -> p.getId().equals(id));
+            
+            if (hasAccess) {
+                PropertyDetailsDTO propertyDetails = imovelService.getPropertyDetails(id);
+                return ResponseEntity.ok(propertyDetails);
+            }
+        }
+        
+        // Proprietario can access their own properties
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_PROPRIETARIO"))) {
+            List<Imovel> ownerProperties = imovelService.findByProprietarioId(userId);
+            boolean hasAccess = ownerProperties.stream().anyMatch(p -> p.getId().equals(id));
+            
+            if (hasAccess) {
+                PropertyDetailsDTO propertyDetails = imovelService.getPropertyDetails(id);
+                return ResponseEntity.ok(propertyDetails);
+            }
+        }
+        
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+            Map.of("error", "Acesso negado. Você não tem permissão para visualizar este imóvel")
+        );
     }
 
     // Atualizar um imóvel existente

@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/proprietarios/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_GESTOR")
                 .requestMatchers(HttpMethod.POST, "/api/proprietarios", "/api/proprietarios/").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/imoveis/properties/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_GESTOR", "ROLE_PROPRIETARIO")
                 .requestMatchers(HttpMethod.GET, "/api/imoveis/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_GESTOR", "ROLE_PROPRIETARIO")
                 .requestMatchers(HttpMethod.POST, "/api/imoveis", "/api/imoveis/").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/imoveis/**").hasAuthority("ROLE_ADMIN")
