@@ -51,6 +51,7 @@ import {
 
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import useImoveis from '@/hooks/useImoveis';
 
 export default function Proprietarios() {
   const { userType } = useAuth();
@@ -72,6 +73,7 @@ export default function Proprietarios() {
     ownerId: null,
     ownerName: '',
   });
+  const { imoveis } = useImoveis();
 
   // Função ajustada para carregar proprietários conforme tipo do usuário
   const carregarProprietarios = async () => {
@@ -227,6 +229,7 @@ export default function Proprietarios() {
         {filteredOwners.length > 0 ? (
           filteredOwners.map((owner) => {
             const type = getOwnerType(owner.documento);
+            const quantidadeImoveis = imoveis.filter(imovel => imovel.proprietario?.id === owner.id).length;
             return (
               <Card key={owner.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
@@ -240,8 +243,8 @@ export default function Proprietarios() {
                   </div>
                   <CardDescription className="flex items-center mt-1">
                     <Building className="h-3 w-3 mr-1" />
-                    {owner.quantidadeImoveis > 0
-                      ? `${owner.quantidadeImoveis} imóvel(is)`
+                    {quantidadeImoveis > 0
+                      ? `${quantidadeImoveis} imóvel(is)`
                       : 'Nenhum imóvel cadastrado'}
                   </CardDescription>
                 </CardHeader>

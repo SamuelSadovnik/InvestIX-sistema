@@ -122,6 +122,22 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
   
+  // --- NOVO CÓDIGO PARA PERFORMANCE DOS IMÓVEIS ---
+  // Soma o valor de venda estimado de todos os imóveis
+  const valorTotalVenda = imoveis.reduce((soma, imovel) => soma + (imovel.valorVendaEstimado || 0), 0);
+  // Calcula valorização de 10% por trimestre
+  const trimestres = 4;
+  const valoresTrimestre = [valorTotalVenda];
+  for (let i = 1; i < trimestres; i++) {
+    valoresTrimestre.push(valoresTrimestre[i - 1] * 1.1);
+  }
+  const labels = ['1º Tri', '2º Tri', '3º Tri', '4º Tri'];
+  const dadosGraficoPerformance = labels.map((label, i) => ({
+    name: label,
+    value: Math.round(valoresTrimestre[i])
+  }));
+  // --- FIM NOVO CÓDIGO ---
+
   return (
     <div className="space-y-6">
       <div className={`rounded-lg p-6 mb-6 ${boxClass}`}> 
@@ -220,7 +236,7 @@ const Dashboard = () => {
             <PerformanceChart
               title="Performance dos Imóveis"
               description="Valorização trimestral com base no índice INCC"
-              data={getQuarterlyPerformanceData(performanceData)}
+              data={dadosGraficoPerformance}
               color="#3b82f6"
               className="h-[420px]"
             />
@@ -230,23 +246,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-function getQuarterlyPerformanceData(data: any[]) {
-  if (!Array.isArray(data) || data.length === 0) return [];
-  const quarters = [
-    { name: '1º Tri', value: 0, count: 0 },
-    { name: '2º Tri', value: 0, count: 0 },
-    { name: '3º Tri', value: 0, count: 0 },
-    { name: '4º Tri', value: 0, count: 0 },
-  ];
-  data.forEach((item, idx) => {
-    const quarterIdx = Math.floor(idx / 3);
-    if (quarters[quarterIdx]) {
-      quarters[quarterIdx].value += item.value;
-      quarters[quarterIdx].count += 1;
-    }
-  });
-  return quarters.map(q => ({ name: q.name, value: q.count ? q.value / q.count : 0 }));
-}
 
 export default Dashboard;

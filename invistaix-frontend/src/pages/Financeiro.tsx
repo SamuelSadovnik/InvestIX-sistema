@@ -280,22 +280,19 @@ export default function Financeiro() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Data</TableHead>
-                        <TableHead>Imóvel</TableHead>
                         <TableHead>Descrição</TableHead>
                         <TableHead>Categoria</TableHead>
-                        <TableHead>Valor</TableHead>
+                        <TableHead className="text-right">Valor</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {transactions.length === 0 ? (
-                        <TableRow><TableCell colSpan={5}>Nenhuma transação encontrada.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={4}>Nenhuma transação encontrada.</TableCell></TableRow>
                       ) : (
                         transactions.map((t, idx) => {
-                          const imovel = imoveis.find(i => String(i.id) === t.propertyId);
                           return (
                             <TableRow key={idx}>
                               <TableCell>{new Date(t.date).toLocaleDateString('pt-BR')}</TableCell>
-                              <TableCell>{imovel?.nomeImovel || 'Imóvel não encontrado'}</TableCell>
                               <TableCell>{t.description}</TableCell>
                               <TableCell>
                                 <Badge variant={t.type === 'income' ? 'default' : 'destructive'}>

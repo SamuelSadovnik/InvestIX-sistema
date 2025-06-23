@@ -32,6 +32,7 @@ import { ManagerDetailsDialog } from '@/components/gestores/ManagerDetailsDialog
 import { DeleteManagerDialog } from '@/components/gestores/DeleteManagerDialog';
 import { Gestor, listarGestores, criarGestor, atualizarGestor, deletarGestor } from '@/hooks/useGestor';
 import { toast } from 'sonner';
+import useImoveis from '@/hooks/useImoveis';
 
 export default function Gestores() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,6 +51,7 @@ export default function Gestores() {
     managerId: '',
     managerName: '',
   });
+  const { imoveis } = useImoveis();
 
   useEffect(() => {
     async function carregarGestores() {
@@ -182,6 +184,7 @@ export default function Gestores() {
           <TableBody>
             {filteredManagers.length > 0 ? (
               filteredManagers.map((manager) => {
+                const quantidadeImoveis = imoveis.filter(imovel => imovel.gestor?.id === manager.id).length;
                 const managerProperties = properties.filter(p => 
                   (manager.properties || []).includes(p.id)
                 );
@@ -193,7 +196,7 @@ export default function Gestores() {
                     <TableCell>
                       <div className="flex items-center">
                         <Building className="h-4 w-4 mr-1 text-muted-foreground" />
-                        <span>{managerProperties.length}</span>
+                        <span>{quantidadeImoveis}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
