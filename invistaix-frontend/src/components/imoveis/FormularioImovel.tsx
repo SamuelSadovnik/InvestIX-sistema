@@ -49,9 +49,7 @@ const formSchema = z.object({
   area: z.number().optional(),
   owner: z.string().min(1, 'Proprietário é obrigatório'),
   manager: z.string().min(1, 'Gestor é obrigatório'),
-  foto: z.any().refine(file => file instanceof File && file.size > 0, {
-    message: "A foto do imóvel é obrigatória",
-  }),
+  foto: z.any().optional(), // Opcional no modo de edição
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -59,10 +57,11 @@ type FormData = z.infer<typeof formSchema>;
 interface AddPropertyFormProps {
   onSuccess: () => void;
   currentUser: any; // TODO: Replace with proper User type
+  imovel?: any; // O imóvel a ser editado, se for modo de edição
 }
 
-const FormularioImovel = (props: AddPropertyFormProps) => {
-  const { onSuccess, currentUser } = props;
+const FormularioImovel = (props: AddPropertyFormProps) => {  const { onSuccess, currentUser, imovel } = props;
+  const isEditMode = !!imovel; // Verifica se estamos no modo de edição
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [proprietarios, setProprietarios] = useState<Proprietario[]>([]);
   const [isLoadingProprietarios, setIsLoadingProprietarios] = useState(true);
@@ -70,99 +69,162 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
   const [isLoadingGestores, setIsLoadingGestores] = useState(true);
   const [isManager, setIsManager] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Carregamento de proprietários e gestores
   useEffect(() => {
-    if (props.currentUser) {
-      setIsManager(props.currentUser.userType === 'GESTOR');
-      setIsAdmin(props.currentUser.userType === 'ADMIN');
-    }
-  }, [props.currentUser]);
-
-  useEffect(() => {
-    const carregarDados = async () => {
-      setIsLoadingProprietarios(true);
-      setIsLoadingGestores(true);
-      
+    const carregarProprietarios = async () => {
       try {
-        // Carregar proprietários com filtro baseado no tipo de usuário
-        let proprietariosData = await listarProprietarios();
-        
-        if (isManager && currentUser) {
-          // Filter owners managed by current manager
-          // Temporary solution until API supports filtering
-          // For now, show all owners with a toast notification
-          toast.info('Filtragem de proprietários por gestor ainda não implementada');
-        }
-        
-        setProprietarios(proprietariosData);
+        setIsLoadingProprietarios(true);
+        const data = await listarProprietarios();
+        setProprietarios(data);
       } catch (error) {
-        toast.error('Erro ao carregar proprietários');
         console.error('Erro ao carregar proprietários:', error);
+        toast.error('Erro ao carregar proprietários');
       } finally {
         setIsLoadingProprietarios(false);
       }
-      
+    };
+
+    const carregarGestores = async () => {
       try {
-        // Carregar gestores apenas para administradores
-        if (isAdmin) {
-          const gestoresData = await listarGestores();
-          setGestores(gestoresData);
-        } else {
-          // For managers, set themselves as the only option
-          if (isManager && currentUser) {
-            setGestores([{
-              id: currentUser.id,
-              nome: currentUser.name,
-              cpf: currentUser.cpf,
-              email: currentUser.email,
-              telefone: currentUser.telefone || '',
-              senha: ''
-            }]);
-          } else {
-            setGestores([]);
-          }
-        }
+        setIsLoadingGestores(true);
+        const data = await listarGestores();
+        setGestores(data);
       } catch (error) {
-        toast.error('Erro ao carregar gestores');
         console.error('Erro ao carregar gestores:', error);
+        toast.error('Erro ao carregar gestores');
       } finally {
         setIsLoadingGestores(false);
       }
     };
 
-    carregarDados();
-  }, [isManager, isAdmin, currentUser]);
+    carregarProprietarios();
+    carregarGestores();
+  }, []);
 
+  // Função para criar o schema do formulário dinamicamente
+  function createFormSchema(isEditMode: boolean) {
+    if (isEditMode) {
+      // No modo de edição, a foto é opcional
+      return formSchema;
+    } else {
+      // No modo de criação, a foto é obrigatória
+      return formSchema.extend({
+        foto: z
+          .any()
+          .refine((file) => file instanceof File && file.size > 0, {
+            message: 'A foto do imóvel é obrigatória',
+          }),
+      });
+    }
+  }
+  
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      rua: '',
-      numero: '',
-      complemento: '',
-      bairro: '',
-      cidade: '',
-      estado: '',
-      cep: '',
-      matriculaValue: 0,
-      matriculaDate: '',
-      rentValue: 0,
-      saleValue: 0,
-      taxValue: 0,
-      rooms: 0,
-      bathrooms: 0,
-      area: 0,
-      owner: '',
-      manager: '',
-      foto: null,
-    },
-  });
+      resolver: zodResolver(createFormSchema(isEditMode)),
+      defaultValues: {
+        name: '',
+        rua: '',
+        numero: '',
+        complemento: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+        cep: '',
+        matriculaValue: 0,
+        matriculaDate: '',
+        rentValue: 0,
+        saleValue: 0,
+        taxValue: 0,
+        rooms: 0,
+        bathrooms: 0,
+        area: 0,
+        owner: '',
+        manager: '',
+        foto: null,
+      },
+    });
 
+  // Carregar proprietários
+  useEffect(() => {
+    async function carregarProprietarios() {
+      try {
+        setIsLoadingProprietarios(true);
+        const dados = await listarProprietarios();
+        setProprietarios(dados);
+      } catch (error) {
+        console.error("Erro ao carregar proprietários:", error);
+        toast.error("Não foi possível carregar os proprietários");
+      } finally {
+        setIsLoadingProprietarios(false);
+      }
+    }
+    carregarProprietarios();
+  }, []);
+
+  // Carregar gestores
+  useEffect(() => {
+    async function carregarGestores() {
+      try {
+        setIsLoadingGestores(true);
+        const dados = await listarGestores();
+        setGestores(dados);
+      } catch (error) {
+        console.error("Erro ao carregar gestores:", error);
+        toast.error("Não foi possível carregar os gestores");
+      } finally {
+        setIsLoadingGestores(false);
+      }
+    }
+      // Verificar se o usuário atual é gestor
+    if (props.currentUser) {
+      setIsManager(props.currentUser.userType === 'GESTOR');
+      setIsAdmin(props.currentUser.userType === 'ADMIN');
+    }
+    
+    carregarGestores();
+  }, [props.currentUser, isManager]);
+
+  // Carregar dados do imóvel quando estiver no modo de edição
+  useEffect(() => {
+    if (imovel) {
+      // Preencher o formulário com os dados do imóvel existente
+      form.reset({
+        name: imovel.nomeImovel || '',
+        type: imovel.tipoImovel || '',
+        rua: imovel.endereco?.rua || '',
+        numero: imovel.endereco?.numero || '',
+        complemento: imovel.endereco?.complemento || '',
+        bairro: imovel.endereco?.bairro || '',
+        cidade: imovel.endereco?.cidade || '',
+        estado: imovel.endereco?.estado || '',
+        cep: imovel.endereco?.cep || '',
+        matriculaValue: imovel.valorMatricula || 0,
+        matriculaDate: imovel.dataRegistroMatricula ? new Date(imovel.dataRegistroMatricula).toISOString().split('T')[0] : '',
+        rentValue: imovel.valorAluguelAtual || 0,
+        saleValue: imovel.valorVendaEstimado || 0,
+        taxValue: imovel.valorIptu || 0,
+        rooms: imovel.numQuartos || 0,
+        bathrooms: imovel.numBanheiros || 0,
+        area: imovel.area || 0,
+        owner: imovel.proprietario?.id?.toString() || '',
+        manager: imovel.gestor?.id?.toString() || '',
+        // Foto será selecionada pelo usuário novamente
+        foto: null,
+      });
+    }
+  }, [imovel, form]);
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
+      // Validação para foto (obrigatória apenas para novos cadastros)
+      if (!isEditMode && (!data.foto || !(data.foto instanceof File) || data.foto.size === 0)) {
+        throw new Error('A foto do imóvel é obrigatória para novos cadastros');
+      }
+      
       // Map property type to backend values
       const backendData = {
+        ...(isEditMode && { id: imovel.id }), // Incluir ID no caso de edição
         nomeImovel: data.name,
         tipoImovel: data.type,
         endereco: {
@@ -180,6 +242,7 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
         valorVendaEstimado: data.saleValue,
         valorIptu: data.taxValue,
         numQuartos: data.rooms,
+        numBanheiros: data.bathrooms || 0,
         area: data.area,
         proprietario: {
           id: parseInt(data.owner)
@@ -189,15 +252,31 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
         }
       };
 
-      // Enviar dados para o backend
+      // Enviar dados para o backend usando FormData
       const formData = new FormData();
       formData.append('imovel', new Blob([JSON.stringify(backendData)], {
         type: 'application/json'
       }));
-      formData.append('foto', data.foto);
+      
+      // Só envia foto se uma nova foto foi selecionada ou estamos em modo de criação
+      if (data.foto instanceof File && data.foto.size > 0) {
+        formData.append('foto', data.foto);
+      } else if (!isEditMode) {
+        // No modo de criação, a foto é obrigatória
+        throw new Error('A foto do imóvel é obrigatória');
+      }
 
-      const response = await fetch('/api/imoveis', {
-        method: 'POST',
+      // Definir o método HTTP e URL com base no modo
+      let method = 'POST';
+      let url = '/api/imoveis';
+      
+      if (isEditMode) {
+        method = 'PUT';
+        url = `/api/imoveis/${imovel.id}`;
+      }
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
@@ -209,24 +288,28 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
         throw new Error(`Erro ${response.status}: ${errorResponse}`);
       }
 
-      toast.success('Imóvel cadastrado com sucesso!');
-      form.reset();
+      toast.success(isEditMode ? 'Imóvel atualizado com sucesso!' : 'Imóvel cadastrado com sucesso!');
+      if (!isEditMode) {
+        form.reset(); // Limpar formulário apenas em criação
+      }
       onSuccess();
     } catch (error: any) {
-      toast.error(`Erro ao cadastrar imóvel: ${error.message}`);
+      toast.error(`Erro ao ${isEditMode ? 'atualizar' : 'cadastrar'} imóvel: ${error.message}`);
       console.error('Erro detalhado:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form {...form}>      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <Card className="mb-4">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Informações do Imóvel</CardTitle>
-            <CardDescription>Dados básicos do imóvel</CardDescription>
+            <CardDescription>
+              {isEditMode 
+                ? 'Altere os dados do imóvel conforme necessário'
+                : 'Dados básicos do imóvel'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -240,7 +323,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel>Nome do Imóvel</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Apartamento Centro" {...field} />
+                          <Input 
+                            placeholder="Ex: Apartamento Centro" 
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -254,7 +340,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione" />
@@ -273,9 +362,7 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                     )}
                   />
                 </div>
-              </div>
-
-              {/* Linha 2: Rua (3/4) e Número (1/4) */}
+              </div>              {/* Linha 2: Rua (3/4) e Número (1/4) */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-3">
                   <FormField
@@ -285,7 +372,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel>Rua</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Av. Paulista" {...field} />
+                          <Input 
+                            placeholder="Ex: Av. Paulista" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -300,7 +390,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel>Número</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: 1000" {...field} />
+                          <Input 
+                            placeholder="Ex: 1000" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -318,7 +411,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                     <FormItem>
                       <FormLabel>Complemento</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: Apt 101" {...field} />
+                        <Input 
+                          placeholder="Ex: Apt 101" 
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -331,7 +427,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                     <FormItem>
                       <FormLabel>Bairro</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: Bela Vista" {...field} />
+                        <Input 
+                          placeholder="Ex: Bela Vista" 
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -339,9 +438,9 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                 />
               </div>
 
-              {/* Linha 4: Cidade (2/4), Estado (1/8), CEP (1/4) */}
-              <div className="grid grid-cols-8 gap-4">
-                <div className="col-span-4">
+              {/* Linha 4: Cidade (2/4), Estado (1/4), CEP (1/4) */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-2">
                   <FormField
                     control={form.control}
                     name="cidade"
@@ -349,7 +448,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel>Cidade</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: São Paulo" {...field} />
+                          <Input 
+                            placeholder="Ex: São Paulo" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -364,14 +466,17 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel>Estado</FormLabel>
                         <FormControl>
-                          <Input placeholder="SP" {...field} />
+                          <Input 
+                            placeholder="Ex: SP" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <div className="col-span-3">
+                <div className="col-span-1">
                   <FormField
                     control={form.control}
                     name="cep"
@@ -379,16 +484,17 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel>CEP</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: 01310-100" {...field} />
+                          <Input 
+                            placeholder="Ex: 01310-100" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
-
-              {/* Linha 5: Valor da Matrícula (3/4) e Data da Matrícula (1/4) */}
+              </div>              {/* Linha 5: Valor da Matrícula (3/4) e Data da Matrícula (1/4) */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-3">
                   <FormField
@@ -422,7 +528,10 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                       <FormItem>
                         <FormLabel className="text-xs">Data da Matrícula</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input 
+                            type="date" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -430,24 +539,35 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                   />
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              {/* Linha 6: Aluguel, Venda e Imposto em colunas iguais */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Valores e Características</CardTitle>
+            <CardDescription>Informações adicionais e financeiras</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Linha 1: Valor do Aluguel (1/3), Valor de Venda (1/3), IPTU (1/3) */}
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="rentValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Aluguel (R$)</FormLabel>
+                      <FormLabel>Valor do Aluguel</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
                           <Input
                             type="number"
-                            placeholder="2500"
+                            placeholder="2.000"
                             className="pl-8"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
+                            // Sempre editável, pois está na lista de campos permitidos
                           />
                         </div>
                       </FormControl>
@@ -460,16 +580,17 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                   name="saleValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Venda (R$)</FormLabel>
+                      <FormLabel>Valor de Venda</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
                           <Input
                             type="number"
-                            placeholder="420000"
+                            placeholder="450.000"
                             className="pl-8"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
+                            // Sempre editável, pois está na lista de campos permitidos
                           />
                         </div>
                       </FormControl>
@@ -482,16 +603,17 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                   name="taxValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Imposto (R$)</FormLabel>
+                      <FormLabel>IPTU (Anual)</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-2 text-muted-foreground">R$</span>
                           <Input
                             type="number"
-                            placeholder="2100"
+                            placeholder="1.200"
                             className="pl-8"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
+                            // Sempre editável, pois está na lista de campos permitidos
                           />
                         </div>
                       </FormControl>
@@ -501,20 +623,21 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                 />
               </div>
 
-              {/* Linha 7: Quartos, Banheiros e Área na mesma linha */}
+              {/* Linha 2: Quartos (1/3), Banheiros (1/3), Área (1/3) */}
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="rooms"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Quartos</FormLabel>
+                      <FormLabel>Número de Quartos</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="2" 
+                        <Input
+                          type="number"
+                          placeholder="3"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
+                          // Sempre editável, pois está na lista de campos permitidos
                         />
                       </FormControl>
                       <FormMessage />
@@ -526,13 +649,14 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                   name="bathrooms"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Banheiros</FormLabel>
+                      <FormLabel>Número de Banheiros</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="2" 
+                        <Input
+                          type="number"
+                          placeholder="2"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
+                          // Sempre editável, pois está na lista de campos permitidos
                         />
                       </FormControl>
                       <FormMessage />
@@ -551,27 +675,7 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                           placeholder="75"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Linha 8: Foto do imóvel (largura total) */}
-              <div className="w-full">
-                <FormField
-                  control={form.control}
-                  name="foto"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Foto do Imóvel (Obrigatória)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => field.onChange(e.target.files?.[0])}
+                          // Sempre editável, pois está na lista de campos permitidos
                         />
                       </FormControl>
                       <FormMessage />
@@ -580,122 +684,135 @@ const FormularioImovel = (props: AddPropertyFormProps) => {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
-        
-        {/* Seção de Proprietários */}
+          </CardContent>        </Card>        {/* Linha 3: Proprietário (1/2) e Gestor (1/2) */}
         <Card className="mb-4">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Proprietário do Imóvel</CardTitle>
-            <CardDescription>Selecione o proprietário deste imóvel</CardDescription>
+            <CardTitle className="text-lg">Proprietário e Gestor</CardTitle>
+            <CardDescription>Selecione o proprietário e gestor deste imóvel</CardDescription>
           </CardHeader>
           <CardContent>
-            <FormField
-              control={form.control}
-              name="owner"
-              render={({ field }) => (
-                <FormItem>
-                  {isLoadingProprietarios ? (
-                    <div className="text-sm text-muted-foreground">Carregando proprietários...</div>
-                  ) : proprietarios.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">Nenhum proprietário encontrado</div>
-                  ) : (
-                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                      {proprietarios.map((proprietario) => (
-                        <FormItem
-                          key={proprietario.id}
-                          className="flex flex-row items-center space-x-3 space-y-0 mb-3"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value === proprietario.id.toString()}
-                              onCheckedChange={() => {
-                                field.onChange(proprietario.id.toString());
-                              }}
-                            />
-                          </FormControl>
-                          <div className="grid gap-1.5 leading-none">
-                            <FormLabel className="text-sm font-medium cursor-pointer">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="owner"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Proprietário</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger disabled={isLoadingProprietarios}>
+                          <SelectValue placeholder="Selecione um proprietário" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingProprietarios ? (
+                          <SelectItem value="loading" disabled>Carregando proprietários...</SelectItem>
+                        ) : proprietarios.length === 0 ? (
+                          <SelectItem value="empty" disabled>Nenhum proprietário encontrado</SelectItem>
+                        ) : (
+                          proprietarios.map((proprietario) => (
+                            <SelectItem key={proprietario.id} value={proprietario.id.toString()}>
                               {proprietario.nome}
-                            </FormLabel>
-                            <p className="text-xs text-muted-foreground">
-                              {proprietario.cpfCnpj} - {proprietario.email}
-                            </p>
-                          </div>
-                        </FormItem>
-                      ))}
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Seção de Gestores */}
-        <Card className="mb-4">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Gestor do Imóvel</CardTitle>
-            <CardDescription>Selecione o gestor deste imóvel</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isManager ? (
-              <div className="p-3 border rounded-md bg-muted/50">
-                <p className="text-sm font-medium">{currentUser.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  Você é o gestor responsável por este imóvel
-                </p>
-                <input type="hidden" {...form.register('manager')} value={currentUser.id} />
-              </div>
-            ) : (
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="manager"
                 render={({ field }) => (
                   <FormItem>
-                    {isLoadingGestores ? (
-                      <div className="text-sm text-muted-foreground">Carregando gestores...</div>
-                    ) : gestores.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">Nenhum gestor encontrado</div>
-                    ) : (
-                      <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                        {gestores.map((gestor) => (
-                          <FormItem
-                            key={gestor.id}
-                            className="flex flex-row items-center space-x-3 space-y-0 mb-3"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value === gestor.id.toString()}
-                                onCheckedChange={() => {
-                                  field.onChange(gestor.id.toString());
-                                }}
-                              />
-                            </FormControl>
-                            <div className="grid gap-1.5 leading-none">
-                              <FormLabel className="text-sm font-medium">
-                                {gestor.nome}
-                              </FormLabel>
-                              <p className="text-xs text-muted-foreground">
-                                {gestor.cpf} - {gestor.email}
-                              </p>
-                            </div>
-                          </FormItem>
-                        ))}
+                    <FormLabel>Gestor</FormLabel>
+                    {isManager ? (
+                      <div className="p-3 border rounded-md bg-muted/50">
+                        <p className="text-sm font-medium">{currentUser.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Você é o gestor responsável por este imóvel
+                        </p>
+                        <input type="hidden" {...form.register('manager')} value={currentUser.id} />
                       </div>
+                    ) : (
+                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGestores}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um gestor" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {isLoadingGestores ? (
+                            <SelectItem value="loading" disabled>Carregando gestores...</SelectItem>
+                          ) : gestores.length === 0 ? (
+                            <SelectItem value="empty" disabled>Nenhum gestor encontrado</SelectItem>
+                          ) : (
+                            gestores.map((gestor) => (
+                              <SelectItem key={gestor.id} value={gestor.id.toString()}>
+                                {gestor.nome}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
                     )}
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
+            </div>
           </CardContent>
         </Card>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <Button type="submit" disabled={isSubmitting} className="invistaix-gradient">
-            {isSubmitting ? 'Cadastrando...' : 'Cadastrar Imóvel'}
+        {/* Linha 4: Upload de Foto */}
+        <div>
+          <FormField
+            control={form.control}
+            name="foto"
+            render={({ field: { value, onChange, ...fieldProps } }) => (
+              <FormItem>
+                <FormLabel>Foto do Imóvel</FormLabel>
+                <FormControl>
+                  <div className="flex flex-col space-y-2">
+                    <Input
+                      {...fieldProps}
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          onChange(file);
+                        }
+                      }}
+                      // Sempre editável, pois está na lista de campos permitidos
+                    />
+                    {isEditMode && !value && (
+                      <p className="text-sm text-muted-foreground">
+                        Manteremos a foto atual caso nenhuma nova seja selecionada
+                      </p>
+                    )}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button 
+            type="submit" 
+            className="invistaix-gradient" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <><span className="animate-spin mr-2">↻</span> Enviando...</>
+            ) : (
+              isEditMode ? 'Atualizar Imóvel' : 'Cadastrar Imóvel'
+            )}
           </Button>
         </div>
       </form>
