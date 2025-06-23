@@ -1,0 +1,21 @@
+package com.invistaix.sistema.enums;
+
+public enum TipoImovel {
+    APARTAMENTO,
+    CASA,
+    CASA_CONDOMINIO,
+    CHACARA,
+    COBERTURA,
+    FAZENDA,
+    GALPAO_COMERCIAL,
+    GALPAO_INDUSTRIAL,
+    KITNET,
+    LOJA_COMERCIAL,
+    PREDIO_COMERCIAL,
+    SALA_COMERCIAL,
+    SITIO,
+    SOBRADO,
+    STUDIO,
+    TERRENO,
+    TERRENO_INDUSTRIAL
+}

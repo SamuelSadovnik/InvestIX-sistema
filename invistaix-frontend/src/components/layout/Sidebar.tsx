@@ -42,17 +42,10 @@ const Sidebar = () => {
       path: "/dashboard/gestores",
       icon: <UserPlus className="h-5 w-5" />,
       allowedUsers: ['ADMIN']
-    },
-    {
+    },    {
       title: "Financeiro",
       path: "/dashboard/financeiro",
       icon: <DollarSign className="h-5 w-5" />,
-      allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
-    },
-    {
-      title: "Performance",
-      path: "/dashboard/performance",
-      icon: <BarChart3 className="h-5 w-5" />,
       allowedUsers: ['ADMIN', 'GESTOR', 'PROPRIETARIO']
     }
   ];

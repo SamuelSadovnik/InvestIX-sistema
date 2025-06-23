@@ -6,10 +6,12 @@ const API_URL = 'http://localhost:8080/api';
 export interface Proprietario {
   id: number;
   nome: string;
+  tipoDocumento: string;
   email: string;
   telefone: string;
-  cpfCnpj: string;
+  documento: string;
   senha: string;
+  quantidadeImoveis?: number;
 }
 
 function getAuthHeaders(): HeadersInit {
@@ -19,6 +21,25 @@ function getAuthHeaders(): HeadersInit {
     ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 }
+
+export const listarProprietariosPorGestor = async (): Promise<Proprietario[]> => {
+  try {
+    const response = await fetch(`${API_URL}/proprietarios/gestor`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data as Proprietario[];
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
+};
 
 export const listarProprietarios = async (): Promise<Proprietario[]> => {
   try {
@@ -35,6 +56,24 @@ export const listarProprietarios = async (): Promise<Proprietario[]> => {
   } catch (error) {
     console.error('Erro na requisição:', error);
     console.log(localStorage.getItem('token'));
+    throw error;
+  }
+};
+
+export const getPropertiesByOwner = async (ownerId: number): Promise<any[]> => {
+  try {
+    const response = await fetch(`${API_URL}/imoveis?proprietarioId=${ownerId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro ao buscar imóveis:', error);
     throw error;
   }
 };

@@ -1,5 +1,7 @@
 package com.invistaix.sistema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.invistaix.sistema.enums.TipoImovel;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,6 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "IMOVEIS")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Imovel {
 
     @Id
@@ -17,10 +20,11 @@ public class Imovel {
     @Column(name = "nome_imovel", nullable = false, length = 100)
     private String nomeImovel;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_imovel", nullable = false, length = 50)
-    private String tipoImovel;
+    private TipoImovel tipoImovel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id", nullable = false)
     private Endereco endereco;
 
@@ -56,6 +60,9 @@ public class Imovel {
     @Column(name = "numero_apartamentos")
     private Integer numeroApartamentos;
 
+    @Column(name = "foto_imovel", columnDefinition = "bytea")
+    private byte[] fotoImovel;
+
     @ManyToMany
     @JoinTable(
         name = "IMOVEL_DESPESA",
@@ -84,7 +91,7 @@ public class Imovel {
     public Imovel() {
     }
 
-    public Imovel(Integer id, String nomeImovel, String tipoImovel, Endereco endereco, Proprietario proprietario,
+    public Imovel(Integer id, String nomeImovel, TipoImovel tipoImovel, Endereco endereco, Proprietario proprietario,
                   Gestor gestor, BigDecimal valorMatricula, LocalDate dataRegistroMatricula,
                   BigDecimal valorAluguelAtual, BigDecimal valorVendaEstimado, BigDecimal valorIptu,
                   BigDecimal area, Integer numQuartos, Integer numeroApartamentos) {
@@ -121,11 +128,11 @@ public class Imovel {
         this.nomeImovel = nomeImovel;
     }
 
-    public String getTipoImovel() {
+    public TipoImovel getTipoImovel() {
         return tipoImovel;
     }
 
-    public void setTipoImovel(String tipoImovel) {
+    public void setTipoImovel(TipoImovel tipoImovel) {
         this.tipoImovel = tipoImovel;
     }
 
@@ -215,5 +222,13 @@ public class Imovel {
 
     public void setNumeroApartamentos(Integer numeroApartamentos) {
         this.numeroApartamentos = numeroApartamentos;
+    }
+
+    public byte[] getFotoImovel() {
+        return fotoImovel;
+    }
+
+    public void setFotoImovel(byte[] fotoImovel) {
+        this.fotoImovel = fotoImovel;
     }
 }

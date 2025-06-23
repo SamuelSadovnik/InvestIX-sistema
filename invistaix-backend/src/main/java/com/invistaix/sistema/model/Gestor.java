@@ -2,9 +2,13 @@ package com.invistaix.sistema.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "GESTORES")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Gestor {
 
     @Id
@@ -18,7 +22,7 @@ public class Gestor {
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name = "telefone", length = 20)
+    @Column(name = "telefone", nullable = false, length = 11, unique = true)
     private String telefone;
 
     @Transient

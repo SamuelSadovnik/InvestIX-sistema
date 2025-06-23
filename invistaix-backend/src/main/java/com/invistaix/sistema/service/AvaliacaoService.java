@@ -45,6 +45,11 @@ public class AvaliacaoService {
         return save(existingAvaliacao);
     }
 
+    // Buscar avaliações por ID do imóvel
+    public List<Avaliacao> findByImovelId(Integer imovelId) {
+        return avaliacaoRepository.findByImovelId(imovelId);
+    }
+
     // Deletar uma avaliação por ID
     public void delete(Integer id) {
         avaliacaoRepository.findById(id); // Verifica se a avaliação existe antes de deletar

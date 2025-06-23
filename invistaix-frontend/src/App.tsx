@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -11,7 +10,7 @@ import { DashboardProvider } from "@/contexts/DashboardContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
-import PropertyDetail from "./pages/PropertyDetail";
+import DetalhesImovel from "./pages/DetalhesImovel";
 import Imoveis from "./pages/Imoveis";
 import Proprietarios from "./pages/Proprietarios";
 import Gestores from "./pages/Gestores";
@@ -43,7 +42,7 @@ const App = () => (
                 }>
                   <Route index element={<Dashboard />} />
                   <Route path="imoveis" element={<Imoveis />} />
-                  <Route path="imoveis/:id" element={<PropertyDetail />} />                  <Route path="proprietarios" element={
+                  <Route path="imoveis/:id" element={<DetalhesImovel />} />                  <Route path="proprietarios" element={
                     <ProtectedRoute allowedRoles={['ADMIN', 'GESTOR']}>
                       <Proprietarios />
                     </ProtectedRoute>

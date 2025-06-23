@@ -9,6 +9,9 @@ public class AuthenticatedUser {
     private UserType userType;
 
     // Construtores
+    public AuthenticatedUser() {
+    }
+
     public AuthenticatedUser(Gestor gestor) {
         this.id = gestor.getId();
         this.nome = gestor.getNome();

@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS ENDERECOS (
 CREATE TABLE IF NOT EXISTS IMOVEIS (
     imovel_id INT PRIMARY KEY AUTO_INCREMENT,
     nome_imovel VARCHAR(100) NOT NULL, -- Nome ou identificação do imóvel
-    tipo_imovel ENUM('APARTAMENTO', 'CASA', 'CASA_CONDOMINIO', 'COBERTURA', 'KITNET', 'STUDIO', 'SOBRADO', 'TERRENO', 'CHACARA', 'SITIO', 'FAZENDA', 'SALA_COMERCIAL', 'LOJA_COMERCIAL', 'GALPAO_COMERCIAL', 'PREDIO_COMERCIAL', 'GALPAO_INDUSTRIAL', 'TERRENO_INDUSTRIAL') NOT NULL,
+    tipo_imovel ENUM('APARTAMENTO', 'CASA', 'CASA_CONDOMINIO', 'CHACARA', 'COBERTURA', 'FAZENDA', 'GALPAO_COMERCIAL', 'GALPAO_INDUSTRIAL', 'KITNET', 'LOJA_COMERCIAL', 'PREDIO_COMERCIAL', 'SALA_COMERCIAL', 'SITIO', 'SOBRADO', 'STUDIO', 'TERRENO', 'TERRENO_INDUSTRIAL') NOT NULL,
     endereco_id INT NOT NULL,
-    proprietario_id INT,
+    proprietario_id INT NOT NULL,
     gestor_id INT,
     -- Dados da Matricula
     valor_matricula DECIMAL(10, 2) NOT NULL, -- Valor da matrícula
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS IMOVEIS (
     valor_venda_estimado DECIMAL(10, 2), -- Valor estimado de venda
     valor_iptu DECIMAL(10, 2), -- Valor atual do IPTU
     -- Opcional
-    foto_imovel MEDIUMBLOB, -- Dados binários da foto do imóvel
+    foto_imovel BYTEA, -- Dados binários da foto do imóvel
     area DECIMAL(10, 2), -- Característica opcional: área
     num_quartos INT, -- Característica opcional: número de quartos
     numero_apartamentos INT, -- Opcional, para prédios
