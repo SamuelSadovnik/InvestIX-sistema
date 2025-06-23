@@ -8,14 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { properties } from '@/data/mockData';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import PerformanceChart from '@/components/charts/PerformanceChart';
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -107,110 +99,106 @@ const PropertyDetail = () => {
           description="IPTU e taxas"
           icon={<DollarSign className="h-4 w-4" />}
         />
-      </div>
+      </div>      {/* Valorização do Imóvel - Expandido para tela cheia */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">Valorização do Imóvel</CardTitle>
+          <CardDescription>
+            Evolução do valor ao longo dos meses com análise de desempenho
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <PerformanceChart
+              title=""
+              description=""
+              data={monthlyPerformance}
+              color="#12d87e"
+            />
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-muted/30 p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Valorização Total</p>
+              <p className="text-lg font-semibold text-primary">{property.performance?.percentage || 5}%</p>
+            </div>
+            <div className="bg-muted/30 p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Valor Inicial</p>
+              <p className="text-lg font-semibold">R$ {property.matriculaValue.toLocaleString()}</p>
+            </div>
+            <div className="bg-muted/30 p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Valor Atual</p>
+              <p className="text-lg font-semibold">R$ {(property.saleValue || property.matriculaValue * 1.05).toLocaleString()}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Gráfico de Performance */}
-        <PerformanceChart
-          title="Valorização do Imóvel"
-          description="Evolução do valor ao longo dos meses"
-          data={monthlyPerformance}
-          color="#9b87f5"
-        />
-
-        {/* Espaço para Mapa */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Localização</CardTitle>
-            <CardDescription>Mapa da propriedade e região</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80 bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/25">
-              <div className="text-center">
-                <MapPin className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-muted-foreground">Mapa da Localização</h3>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Integração com mapa será implementada aqui
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {property.address}
-                </p>
+      {/* Características do imóvel - Redesenhado e expandido */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">Características do Imóvel</CardTitle>
+          <CardDescription>Detalhes e especificações completas</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-muted/20 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Informações Básicas</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Tipo:</span>
+                  <span className="font-medium">{property.type}</span>
+                </div>
+                {property.area && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Área Total:</span>
+                    <span className="font-medium">{property.area}m²</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Endereço:</span>
+                  <span className="font-medium truncate max-w-[180px]">{property.address}</span>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detalhes do imóvel */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Características */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Características</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Tipo:</span>
-                <span className="font-medium">{property.type}</span>
-              </div>
-              {property.area && (
+            
+            <div className="bg-muted/20 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Especificações</h3>
+              <div className="space-y-3">
+                {property.rooms && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Quartos:</span>
+                    <span className="font-medium">{property.rooms}</span>
+                  </div>
+                )}
+                {property.bathrooms && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Banheiros:</span>
+                    <span className="font-medium">{property.bathrooms}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Área:</span>
-                  <span className="font-medium">{property.area}m²</span>
+                  <span className="text-muted-foreground">Matrícula:</span>
+                  <span className="font-medium">{id?.slice(-6).toUpperCase() || 'N/A'}</span>
                 </div>
-              )}
-              {property.rooms && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Quartos:</span>
-                  <span className="font-medium">{property.rooms}</span>
-                </div>
-              )}
-              {property.bathrooms && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Banheiros:</span>
-                  <span className="font-medium">{property.bathrooms}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Proprietário:</span>
-                <span className="font-medium">{property.owner}</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Histórico de Avaliações */}
-        {property.assessments && property.assessments.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Avaliações</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Avaliador</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {property.assessments.map((assessment, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{new Date(assessment.date).toLocaleDateString()}</TableCell>
-                      <TableCell>{assessment.assessor}</TableCell>
-                      <TableCell className="text-right font-medium">
-                        R$ {assessment.value.toLocaleString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+            
+            <div className="bg-muted/20 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Responsáveis</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Proprietário:</span>
+                  <span className="font-medium">{property.owner}</span>
+                </div>
+                {property.manager && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Gestor:</span>
+                    <span className="font-medium">{property.manager}</span>
+                  </div>                )}
+              </div>
+            </div></div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
