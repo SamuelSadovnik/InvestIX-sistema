@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>InvestIX - Sistema de Gerenciamento de Investimentos</h1>
-  <p>Uma plataforma full-stack para cadastrar e acompanhar a rentabilidade da sua carteira de investimentos de forma simples e visual.</p>
+  <h1>InvestIX - Sistema de Gerenciamento de Carteira de Imóveis</h1>
+  <p>Uma plataforma para cadastrar, gerenciar e acompanhar a rentabilidade de seus imóveis de forma centralizada.</p>
   
   <img src="https://img.shields.io/github/repo-size/SamuelSadovnik/InvestIX-sistema" alt="Tamanho do Repositório">
   <img src="https://img.shields.io/github/last-commit/SamuelSadovnik/InvestIX-sistema" alt="Último Commit">
@@ -24,18 +24,20 @@
 
 ### 💻 Sobre o Projeto
 
-O **InvestIX** foi desenvolvido como uma solução completa para investidores que desejam ter um controle claro e centralizado de seus ativos financeiros. A plataforma permite o cadastro de diferentes tipos de investimentos, como Ações e Fundos Imobiliários (FIIs), e oferece um dashboard intuitivo com gráficos para visualizar a evolução e a composição da carteira.
+O **InvestIX** foi desenvolvido como uma solução completa para proprietários e investidores do setor imobiliário que desejam ter um controle claro de sua carteira de imóveis. A plataforma permite o cadastro de propriedades (casas, apartamentos, terrenos), o acompanhamento de receitas de aluguel, despesas de manutenção e a visualização da valorização dos bens ao longo do tempo.
 
 ---
 
 ### ✨ Funcionalidades
 
 * 🔐 **Autenticação de Usuários:** Sistema seguro de Login e Cadastro.
-* 📊 **Dashboard Interativo:** Gráficos (pizza e linha) que exibem a distribuição dos ativos e a rentabilidade ao longo do tempo.
-* ➕ **Cadastro de Ativos:** Adicione novos investimentos à sua carteira de forma simples.
-* 🗑️ **Remoção de Ativos:** Gerencie seus ativos, removendo os que não fazem mais parte da sua estratégia.
-* 📈 **Histórico de Transações:** Visualize todas as operações de compra e venda realizadas.
-* 🔄 **Responsividade (parcial/total):** A interface se adapta a diferentes tamanhos de tela. ---
+* 📊 **Dashboard Interativo:** Gráficos que exibem a distribuição dos imóveis por tipo, a receita total de aluguéis e o balanço de despesas.
+* 🏠 **Cadastro de Imóveis:** Adicione novas propriedades à sua carteira com detalhes como endereço, valor de compra, área e tipo.
+* 🗑️ **Gerenciamento de Imóveis:** Edite informações ou remova propriedades que foram vendidas.
+* 💸 **Controle Financeiro:** Registre receitas de aluguel e despesas com IPTU, condomínio, reformas e manutenções para cada imóvel.
+* 📈 **Histórico e Rentabilidade:** Visualize o fluxo de caixa por propriedade e acompanhe a rentabilidade da sua carteira imobiliária.
+
+---
 
 ### 🛠️ Tecnologias Utilizadas
 
