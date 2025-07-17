@@ -135,6 +135,6 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 * GitHub: [SamuelSadovnik](https://github.com/SamuelSadovnik)
 * LinkedIn: [https://www.linkedin.com/in/samuel-malaquias-sadovnik-13b65231b/](https://www.linkedin.com/in/samuel-malaquias-sadovnik-13b65231b/)
-* Email: `[seu_email@dominio.com]`
+* Email: [Samuel Email](samucvel@gmail.com)
 
-<p align="center">Feito com ❤️ por Samuel Sadovnik</p>
+<p align="center">Feito com ❤️</p>
