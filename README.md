@@ -129,12 +129,4 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ---
 
-### ✉️ Contato
 
-**Samuel Sadovnik**
-
-* GitHub: [SamuelSadovnik](https://github.com/SamuelSadovnik)
-* LinkedIn: [https://www.linkedin.com/in/samuel-malaquias-sadovnik-13b65231b/](https://www.linkedin.com/in/samuel-malaquias-sadovnik-13b65231b/)
-* Email: [Samuel Email](samucvel@gmail.com)
-
-<p align="center">Feito com ❤️</p>
